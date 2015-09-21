@@ -36,7 +36,7 @@ app.use('/we',function(req, res, next){
 	//append the qs(query string of latitude and longitude)
 	weather.get({ qs: { lat: latT, lon: lonT} }, function (error, weatherResponse, body) {
 		if (error) return console.log(error);
-		db.collection('weather').insert(body);
+		db.collection('weathers').insert(body);
 		//JSON.stringify(body);
 		console.log(body);
 	});
