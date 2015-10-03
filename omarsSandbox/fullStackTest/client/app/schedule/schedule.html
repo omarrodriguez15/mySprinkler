@@ -5,23 +5,30 @@
     <h1>Schedules!</h1>
   </div>
 </header>
-<table class="table table-striped table-responsive">
-	<thead>
-		<th>Monday</th>
-		<th>Tuesday</th>
-		<th>Wednesday</th>
-		<th>Thursday</th>
-		<th>Friday</th>
-	</thead>
-	<tbody>
-		
-	</tbody>
-</table>
+<div class="col-md-1"></div>
+<div ng-repeat="days in week" class="panel panel-default col-md-2">
+  <table class="table table-striped table-responsive">
+    <thead>
+      <th>{{days.day}}</th>
+    </thead>
+    <tbody>
+      <td>Start Time
+      <select class="form-control">
+        <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
+      </select>
+      </td>
+      <td>End Time
+      <select class="form-control">
+        <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
+      </select>
+      </td>
+    </tbody>
+  </table>
+</div>
+<div class="col-md-1"></div>
+
 
 <footer class="footer">
   <div class="container">
-      <p>Angular Fullstack v2.1.1 |
-        <a href="https://twitter.com/tyhenkel">@tyhenkel</a> |
-         <a href="https://github.com/DaftMonk/generator-angular-fullstack/issues?state=open">Issues</a></p>
   </div>
 </footer>
