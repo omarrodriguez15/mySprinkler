@@ -20,6 +20,13 @@ angular.module('fullStackTestApp')
       },
       {
         day:'Friday'
-      }];
+      },
+      {
+        day:'Saturday'
+      },
+      {
+        day:'Sunday'
+      }
+      ];
     $scope.message = 'Hello';
   });
