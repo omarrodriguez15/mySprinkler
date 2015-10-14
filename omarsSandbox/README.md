@@ -52,7 +52,7 @@ Run exit to get out. However if you get an error run
  window. DO NOT STOP THE MONGOD PROCESS. When you close the terminal window
  the mongo daemon should continue to run in the background.
  
- ####Step 3
+####Step 3
  Now in the server directory run node app.js after a very small delay
  you should see listening on port 3000...
  
