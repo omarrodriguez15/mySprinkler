@@ -9,6 +9,10 @@ angular.module('fullStackTestApp')
     {
       'title': 'Schedule',
       'link': '/schedule'
+    },
+    {
+      'title': 'Settings',
+      'link': '/sprinklerSettings'
     }];
 
     $scope.isCollapsed = true;
