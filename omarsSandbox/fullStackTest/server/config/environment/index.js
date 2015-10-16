@@ -46,6 +46,9 @@ var all = {
   openWeather:{
     apiKey: process.env.OPENWEATHER_ID || 'id'
   },
+  geoCoding:{
+    apiKey: process.env.GEOCODING_ID || 'id'
+  },
   facebook: {
     clientID:     process.env.FACEBOOK_ID || 'id',
     clientSecret: process.env.FACEBOOK_SECRET || 'secret',
