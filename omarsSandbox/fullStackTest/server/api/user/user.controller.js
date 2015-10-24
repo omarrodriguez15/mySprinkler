@@ -4,6 +4,12 @@ var User = require('./user.model');
 var passport = require('passport');
 var config = require('../../config/environment');
 var jwt = require('jsonwebtoken');
+//Doc: https://developers.google.com/maps/documentation/geocoding/intro?csw=1
+//Example of API request
+//https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY
+var geoCode = require('request').defaults({
+  url: 'https://maps.googleapis.com/maps/api/geocode/json'
+});
 
 var validationError = function(res, err) {
   return res.status(422).json(err);
@@ -25,12 +31,25 @@ exports.index = function(req, res) {
  */
 exports.create = function (req, res, next) {
   var newUser = new User(req.body);
-  newUser.provider = 'local';
-  newUser.role = 'user';
-  newUser.save(function(err, user) {
-    if (err) return validationError(res, err);
-    var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresInMinutes: 60*5 });
-    res.json({ token: token });
+  
+  //convert address to lat and lon
+  //this should only been done once this is for testing right now
+  geoCode.get({ qs: {address: newUser.adress + ', ' + newUser.city + ', ' + newUser.state , key: config.geoCoding.apiKey}}, function(error, response, body){
+    if  (error) return console.log(error);
+    
+    var location = JSON.parse(body).results[0].geometry.location;
+    //console.log(location);
+    
+    newUser.cord.lat = location.lat
+    newUser.cord.lon = location.lng;
+    newUser.provider = 'local';
+    newUser.role = 'user';
+    
+    newUser.save(function(err, user) {
+      if (err) return validationError(res, err);
+      var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresInMinutes: 60*5 });
+      res.json({ token: token });
+    });
   });
 };
 

@@ -12,7 +12,14 @@ angular.module('fullStackTestApp')
         Auth.createUser({
           name: $scope.user.name,
           email: $scope.user.email,
-          password: $scope.user.password
+          password: $scope.user.password,
+          address: $scope.user.address,
+          city: $scope.user.city,
+          state: $scope.user.state,
+          cord:{lat:'',lon:''},
+          schedId: '',
+          settingId: '',
+          piId: '',
         })
         .then( function() {
           // Account created, redirect to home

@@ -15,10 +15,13 @@ var UserSchema = new Schema({
   hashedPassword: String,
   provider: String,
   salt: String,
-  facebook: {},
-  twitter: {},
-  google: {},
-  github: {}
+  address: String,
+  city: String,
+  state: String,
+  cord: {lat: String, lon: String},
+  schedId: String,
+  settingId: String,
+  piId: String
 });
 
 /**

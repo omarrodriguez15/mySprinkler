@@ -39,11 +39,11 @@
        </div>
        <div class="form-group col-md-6" ng-class="{ 'has-success': form.name.$valid && submitted,
                                             'has-error': form.name.$invalid && submitted }">
-          <label>Postal Code</label>
-          <input type="number" name="PostalCode" class="form-control" ng-model="user.pcode"
+          <label>State</label>
+          <input type="text" name="State" class="form-control" ng-model="user.state"
                  required/>
           <p class="help-block" ng-show="form.name.$error.required && submitted">
-            An address is required
+            A state is required
           </p>
         </div>
 

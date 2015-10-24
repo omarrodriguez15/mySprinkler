@@ -61,7 +61,7 @@ function pingWeather() {
   //these are test variables should be removed and dynamic for production
   var addressT = '1600 Amphitheatre Parkway, Mountain View, CA';
   var location;
-  
+ 
   //convert address to lat and lon
   //this should only been done once this is for testing right now
   geoCode.get({ qs: {address: addressT, key: config.geoCoding.apiKey}}, function(error, response, body){
