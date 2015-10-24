@@ -10,6 +10,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 var express = require('express');
 var mongoose = require('mongoose');
 var config = require('./config/environment');
+var Weather = require('./api/rawWeather/rawWeather.model');
 
 // Connect to database
 mongoose.connect(config.mongo.uri, config.mongo.options);
@@ -39,13 +40,6 @@ var weather = require('request').defaults({
   json: true
 });
 
-//Doc: https://developers.google.com/maps/documentation/geocoding/intro?csw=1
-//Example of API request
-//https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=YOUR_API_KEY
-var geoCode = require('request').defaults({
-  url: 'https://maps.googleapis.com/maps/api/geocode/json'
-})
-
 // Start server
 server.listen(config.port, config.ip, function () {
   console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
@@ -58,24 +52,22 @@ server.listen(config.port, config.ip, function () {
 
 //will need to ping weather for each user in the database
 function pingWeather() {
-  //these are test variables should be removed and dynamic for production
-  var addressT = '1600 Amphitheatre Parkway, Mountain View, CA';
-  var location;
- 
-  //convert address to lat and lon
-  //this should only been done once this is for testing right now
-  geoCode.get({ qs: {address: addressT, key: config.geoCoding.apiKey}}, function(error, response, body){
-    if  (error) return console.log(error);
+  //test lat and lon
+  var Tlat = '30.41643';
+  var Tlon = '-95.52654689999997';
+  //append the qs(query string of latitude and longitude)
+  weather.get({ qs: { lat: Tlat/*location.lat*/, lon: Tlon/*location.lng*/, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
+    if (error) return console.log(error);
+    //db.collection('weathers').insert(body);
+    //JSON.stringify(body);
     
-    location = JSON.parse(body).results[0].geometry.location;
-    console.log(location);
+    body.timestamp = new Date().toString();
+    console.log(body);
+    var newWeather = new Weather(body);
+    console.log(newWeather);
     
-    //append the qs(query string of latitude and longitude)
-    weather.get({ qs: { lat: location.lat, lon: location.lng, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
-      if (error) return console.log(error);
-      //db.collection('weathers').insert(body);
-      //JSON.stringify(body);
-      console.log(body);
+    newWeather.save(function(err, sched) {
+      if (err) return console.log(err);
     });
   });
 }
