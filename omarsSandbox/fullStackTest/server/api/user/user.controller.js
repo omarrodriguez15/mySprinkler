@@ -1,6 +1,8 @@
 'use strict';
 
 var User = require('./user.model');
+var Schedule = require('../schedule/schedule.model');
+var defaultSchedule = require('../schedule/defaultSchedule');
 var passport = require('passport');
 var config = require('../../config/environment');
 var jwt = require('jsonwebtoken');
@@ -36,19 +38,23 @@ exports.create = function (req, res, next) {
   //this should only been done once this is for testing right now
   geoCode.get({ qs: {address: newUser.adress + ', ' + newUser.city + ', ' + newUser.state , key: config.geoCoding.apiKey}}, function(error, response, body){
     if  (error) return console.log(error);
-    
+    var newSchedule = new Schedule(defaultSchedule);
     var location = JSON.parse(body).results[0].geometry.location;
     //console.log(location);
-    
-    newUser.cord.lat = location.lat
-    newUser.cord.lon = location.lng;
-    newUser.provider = 'local';
-    newUser.role = 'user';
-    
-    newUser.save(function(err, user) {
-      if (err) return validationError(res, err);
-      var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresInMinutes: 60*5 });
-      res.json({ token: token });
+   
+    newSchedule.save(function(err, sched) {
+      
+      newUser.cord.lat = location.lat;
+      newUser.cord.lon = location.lng;
+      newUser.provider = 'local';
+      newUser.role = 'user';
+      newUser.schedId = sched._id;
+      
+      newUser.save(function(err, user) {
+        if (err) return validationError(res, err);
+        var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresInMinutes: 60*5 });
+        res.json({ token: token });
+      });
     });
   });
 };
