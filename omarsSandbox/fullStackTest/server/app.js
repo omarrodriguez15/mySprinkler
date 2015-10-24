@@ -11,6 +11,7 @@ var express = require('express');
 var mongoose = require('mongoose');
 var config = require('./config/environment');
 var Weather = require('./api/rawWeather/rawWeather.model');
+var User = require('./api/user/user.model')
 
 // Connect to database
 mongoose.connect(config.mongo.uri, config.mongo.options);
@@ -50,25 +51,25 @@ server.listen(config.port, config.ip, function () {
 //1 hour is 3600000 milliseconds
 //setInterval(pingWeather, 3600000);
 
-//will need to ping weather for each user in the database
 function pingWeather() {
   //test lat and lon
-  var Tlat = '30.41643';
-  var Tlon = '-95.52654689999997';
-  //append the qs(query string of latitude and longitude)
-  weather.get({ qs: { lat: Tlat/*location.lat*/, lon: Tlon/*location.lng*/, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
-    if (error) return console.log(error);
-    //db.collection('weathers').insert(body);
-    //JSON.stringify(body);
-    
-    body.timestamp = new Date().toString();
-    console.log(body);
-    var newWeather = new Weather(body);
-    console.log(newWeather);
-    
-    newWeather.save(function(err, sched) {
-      if (err) return console.log(err);
-    });
+  User.find({}, function(err, users){
+    //will need to ping weather for each user in the database
+    for (var i=0; i < users.length ;i++) {
+      //make sure we have cordinates
+      if(typeof users[i].cord.lat === 'undefined') continue;
+      //append the qs(query string of latitude and longitude)
+      weather.get({ qs: { lat: users[i].cord.lat, lon: users[i].cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
+        if (error) return console.log(error);
+        
+        body.timestamp = new Date().toString();
+        var newWeather = new Weather(body);
+        
+        newWeather.save(function(err, sched) {
+          if (err) return console.log(err);
+        });
+      });
+    }
   });
 }
 
