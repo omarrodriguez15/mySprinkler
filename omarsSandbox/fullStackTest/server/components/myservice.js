@@ -16,7 +16,7 @@ var weather = require('request').defaults({
   json: true
 });
 
-function getCurrentWeather() {
+function getCurrentWeather(callback) {
 	weather.url = currentWeather;
 	//test lat and lon
 	User.find({}, function(err, users){
@@ -32,12 +32,31 @@ function getCurrentWeather() {
 				body.timestamp = new Date().toString();
 				var newWeather = new Weather(body);
 				
-				newWeather.save(function(err, sched) {
+				newWeather.save(function(err, res) {
 					if (err) return console.log(err);
 					console.log('successfully ping of current weather and save');
+					//callback will condense and save in seperate collection
+					callback(res);
 				});
 			});
 		}
+	});
+}
+
+function createCondDoc(weatherRes){
+	var _newCondWeather = {};
+	_newCondWeather.temp = weatherRes.main.temp;
+	_newCondWeather.humidity = weatherRes.main.humidity;
+	_newCondWeather.windspeed = weatherRes.wind.speed;
+	
+	//rain property only exist if it rained in pass 3 hours
+	_newCondWeather.rain = typeof weatherRes.rain === 'undefined'? '0': _newCondWeather.rain = weatherRes.rain['3h'];
+	
+	var newCondWeather = new CondWeather(_newCondWeather); 
+	
+	newCondWeather.save(function(err, res) {
+		if (err) return console.log(err);
+		console.log('successfully condensed and saved condWeather');
 	});
 }
 
@@ -59,7 +78,7 @@ function getForecast() {
 				body.timestamp = new Date().toString();
 				var newForecast = new Forecast(body);
 				
-				newForecast.save(function(err, sched) {
+				newForecast.save(function(err, res) {
 					if (err) return console.log(err);
 					console.log('successfully ping of weather forecast and save');
 				});
@@ -72,10 +91,11 @@ module.exports = {
 	//do check to see if any request have been made in the last hour
 	//if not ping it once then set the interval
 	//1 hour is 3600000 milliseconds
+	//3h 10800000
 	makeEvents: function(){
 		 setInterval(function(){
-			 getCurrentWeather();
-			 }, 3600000);
+			 getCurrentWeather(createCondDoc);
+			 }, 10800000);
 		 //86400000 miliseconds in a day
 		 //604800000 in 7 days	 
 		 setInterval(function(){
