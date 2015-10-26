@@ -21,3 +21,15 @@ Then I updated bower cleaned cache and reinstalled bower dependencies
     bower cache clean
     sudo npm install -g bower
     bower install
+
+
+#ARCH Linux Pi
+
+     pacman -Syyuu
+     pacman -S iw wpa_supplicant dialog
+     wifi-menu
+     //maybe do this just for safe measure
+     ls /etc/netctl//look for profilename
+     chmod 600 /etc/netctl/PROFILENAMEHERE
+     systemctl reboot
+     netctl start PROFILENAMEHERE
