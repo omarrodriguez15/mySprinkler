@@ -38,7 +38,7 @@ var ScheduleSchema = new Schema({
     start: String,
     end: String,
     status: String
-  },
+  }
 });
 
 module.exports = mongoose.model('Schedule', ScheduleSchema);
