@@ -2,7 +2,13 @@
 
 var Weather = require('../api/rawWeather/rawWeather.model');
 var User = require('../api/user/user.model');
+var Forecast = require('../api/forecast/forecast.model');
+var CondWeather = require('../api/condweather/condweather.model');
+
 var config = require('../config/environment');
+var currentWeather = 'http://api.openweathermap.org/data/2.5/weather';
+var forecast = 'http://api.openweathermap.org/data/2.5/forecast';
+
 //Open Weather API
 //Doc: http://openweathermap.org/current#geo
 var weather = require('request').defaults({
@@ -10,26 +16,54 @@ var weather = require('request').defaults({
   json: true
 });
 
-function pingWeather() {
+function getCurrentWeather() {
+	weather.url = currentWeather;
 	//test lat and lon
 	User.find({}, function(err, users){
 		//will need to ping weather for each user in the database
 		for (var i=0; i < users.length ;i++) {
-		//make sure we have cordinates
-		if(typeof users[i].cord.lat === 'undefined') continue;
-		
-		//append the qs(query string of latitude and longitude)
-		weather.get({ qs: { lat: users[i].cord.lat, lon: users[i].cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
-			if (error) return console.log(error);
+			//make sure user has cordinates
+			if(typeof users[i].cord.lat === 'undefined') continue;
 			
-			body.timestamp = new Date().toString();
-			var newWeather = new Weather(body);
-			
-			newWeather.save(function(err, sched) {
-				if (err) return console.log(err);
-				console.log('successfully ping of weather and save');
+			//append the qs(query string of latitude and longitude)
+			weather.get({ qs: { lat: users[i].cord.lat, lon: users[i].cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
+				if (error) return console.log(error);
+				
+				body.timestamp = new Date().toString();
+				var newWeather = new Weather(body);
+				
+				newWeather.save(function(err, sched) {
+					if (err) return console.log(err);
+					console.log('successfully ping of current weather and save');
+				});
 			});
-		});
+		}
+	});
+}
+
+function getForecast() {
+	//Get all users
+	User.find({}, function(err, users){
+		//make sure url for getting forecast correct
+		weather.url = forecast;
+		
+		//will need to ping weather for each user in the database
+		for (var i=0; i < users.length ;i++) {
+		//make sure user has cordinates
+		if(typeof users[i].cord.lat === 'undefined') continue;
+			
+			//append the qs(query string of latitude and longitude)
+			weather.get({ qs: { lat: users[i].cord.lat, lon: users[i].cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
+				if (error) return console.log(error);
+				
+				body.timestamp = new Date().toString();
+				var newForecast = new Forecast(body);
+				
+				newForecast.save(function(err, sched) {
+					if (err) return console.log(err);
+					console.log('successfully ping of weather forecast and save');
+				});
+			});
 		}
 	});
 }
@@ -39,6 +73,13 @@ module.exports = {
 	//if not ping it once then set the interval
 	//1 hour is 3600000 milliseconds
 	makeEvents: function(){
-		 setInterval(pingWeather, 3600000);
+		 setInterval(function(){
+			 getCurrentWeather();
+			 }, 3600000);
+		 //86400000 miliseconds in a day
+		 //604800000 in 7 days	 
+		 setInterval(function(){
+		 	 getForecast();
+		 }, 604800000);
 	}
 }
