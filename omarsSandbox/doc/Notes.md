@@ -19,5 +19,5 @@ I had problems with bower
 Then I updated bower cleaned cache and reinstalled bower dependencies
 
     bower cache clean
-    npm install -g bower
+    sudo npm install -g bower
     bower install
