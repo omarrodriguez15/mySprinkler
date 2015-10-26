@@ -2,14 +2,8 @@ var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
-//lat = 30.627977 & lon = -96.334407
-var weather = require('request').defaults({
-  url: 'http://api.openweathermap.org/data/2.5/weather',
-  json: true
-});
-
-
 var _ = require('lodash');
+var services = require('./components/service');
 
 //Create the application
 var app = express();
@@ -29,17 +23,7 @@ app.use(function(req, res, next){
 
 app.use('/hello',function(req, res, next){
 	res.send('Hello mySprinkler');
-	next();
-});
-app.use('/we',function(req, res, next){
-	var latT = '30.627977', lonT = '-96.334407';
-	//append the qs(query string of latitude and longitude)
-	weather.get({ qs: { lat: latT, lon: lonT} }, function (error, weatherResponse, body) {
-		if (error) return console.log(error);
-		db.collection('weathers').insert(body);
-		//JSON.stringify(body);
-		console.log(body);
-	});
+	services.beginTimer();
 	next();
 });
 

@@ -11,6 +11,6 @@ var WeatherSchema = new mongoose.Schema({
  	 type: String,
 	 require: true
 	}
-});
+},{ "strict": false });
 
 module.exports = WeatherSchema;

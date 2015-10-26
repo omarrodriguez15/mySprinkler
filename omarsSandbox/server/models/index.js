@@ -2,5 +2,6 @@
 
 module.exports = {
 	//example: require('./example.js'),
-	weather: require('./Weather.js')
+	weather: require('./Weather.js'),
+	schedule: require('./schedule.js')
 };
