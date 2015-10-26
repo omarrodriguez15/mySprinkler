@@ -10,6 +10,7 @@ var path = require('path');
 module.exports = function(app) {
 
   // Insert routes below
+  app.use('/api/pis', require('./api/pi'));
   app.use('/api/condweather', require('./api/condweather'));
   app.use('/api/forecasts', require('./api/forecast'));
   app.use('/api/rawWeather', require('./api/rawWeather'));
