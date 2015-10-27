@@ -33,3 +33,8 @@ Then I updated bower cleaned cache and reinstalled bower dependencies
      chmod 600 /etc/netctl/PROFILENAMEHERE
      systemctl reboot
      netctl start PROFILENAMEHERE
+     
+Create new user
+    useradd name
+    passwd name
+add user to wheel
