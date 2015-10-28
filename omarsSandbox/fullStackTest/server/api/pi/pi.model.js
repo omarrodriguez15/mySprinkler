@@ -8,6 +8,6 @@ var PiSchema = new Schema({
   ownerid: String,
   serialnumber: String,
   status: String,
-});
+},{ "strict": false });
 
 module.exports = mongoose.model('Pi', PiSchema);
