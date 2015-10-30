@@ -37,10 +37,22 @@ exports.create = function (req, res, next) {
   //convert address to lat and lon
   //this should only been done once this is for testing right now
   geoCode.get({ qs: {address: newUser.adress + ', ' + newUser.city + ', ' + newUser.state , key: config.geoCoding.apiKey}}, function(error, response, body){
+    var location;
     if  (error) return console.log(error);
     var newSchedule = new Schedule(defaultSchedule);
-    var location = JSON.parse(body).results[0].geometry.location;
-    //console.log(location);
+    
+    if(typeof body.results !== 'undefined' 
+       && body.results.count > 0) {
+      location = JSON.parse(body).results[0].geometry.location;
+    }
+    else{
+      console.log('Unsuccesful conversion of address to cordinates');
+      //Default Kyle field cordinates
+      location = {
+        lat:'30.609883',
+        lng:'-96.340458',
+      };
+    }
    
     newSchedule.save(function(err, sched) {
       
