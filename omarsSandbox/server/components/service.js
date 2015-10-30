@@ -2,20 +2,23 @@
 
 var config = require('../config/local.env');
 var mongoose = require('mongoose');
-var scheduleSchema = require('../models/schedule');
-var schedule = mongoose.model('schedule', scheduleSchema);
-//maybe use https
+var models = require('../models/index');
+//var weatherSchema = require('../models/Weather');
 var http = require('http');
 var querystring = require('querystring');
-//host is by default localhost for testing
 var host = 'localhost';
+/*
+var scheduleSchema = require('../models/schedule');
+var schedule = mongoose.model('schedule', scheduleSchema);
+*/
 
 module.exports = {
 	beginTimer : function(){
 		//3600000 miliseconds is an hour
 		setInterval(function(){
-			postIp();
-		}, 3600000);
+			getWeather();
+			//postIp();
+		}, 5000);
 	}
 };
 
@@ -27,6 +30,7 @@ function putIp(){
 	require('dns').lookup(require('os').hostname(), function (err, add, fam) {
 		console.log('addr: '+add);
 		performRequest('/api/pis', 'POST', {
+			ip: add,
 			name: 'test',
 			ownerid: 'jsahd',
 			serialnumber: 'hsa89',
@@ -57,12 +61,16 @@ function postIp(){
 	});
 }
 
-//need to grab most current weather from web server
-//then decide what to write to local db depending on when the
-//last time you successfully communincated with the webserver
+//get condensed weather info from webserver
+//save to local db
 function getWeather(){
+	var Weather = mongoose.model('weathers', models.weather);
 	performRequest('/api/condweather', 'GET', {}, 
 		function(data) {
+			var newWeather = new Weather(data);
+			newWeather.save(function(err){
+				if(err) console.log(err);
+			});
 			console.log('response:', data);
 		});
 	console.log('Get Weather Fired!');
@@ -71,43 +79,7 @@ function getWeather(){
 //For testing its sending a get request not post
 //Production should 
 function postSchedule(){
-	performRequest('/api/schedules', 'POST', {
-			monday:{
-			start: '15:00',
-			end: '16:00',
-			status: '0'
-		},
-		tuesday:{
-			start: '15:00',
-			end: '16:00',
-			status: '0'
-		},
-		wednesday:{
-			start: '15:00',
-			end: '16:00',
-			status: '0'
-		},
-		thursday:{
-			start: '15:00',
-			end: '16:00',
-			status: '0'
-		},
-		friday:{
-			start: '15:00',
-			end: '16:00',
-			status: '0'
-		},
-		saturday:{
-			start: '15:00',
-			end: '16:00',
-			status: '0'
-		},
-		sunday:{
-			start: '15:00',
-			end: '16:00',
-			status: '0'
-		}
-		}, function(data) {
+	performRequest('/api/schedules', 'POST', testScheduleObject, function(data) {
 			console.log('response:', data);
 		});
 	console.log('GET Schedules Fired!');
@@ -155,3 +127,41 @@ function performRequest(endpoint, method, data, success) {
   req.write(dataString);
   req.end();
 }
+
+var testScheduleObject = {
+			monday:{
+			start: '15:00',
+			end: '16:00',
+			status: '0'
+		},
+		tuesday:{
+			start: '15:00',
+			end: '16:00',
+			status: '0'
+		},
+		wednesday:{
+			start: '15:00',
+			end: '16:00',
+			status: '0'
+		},
+		thursday:{
+			start: '15:00',
+			end: '16:00',
+			status: '0'
+		},
+		friday:{
+			start: '15:00',
+			end: '16:00',
+			status: '0'
+		},
+		saturday:{
+			start: '15:00',
+			end: '16:00',
+			status: '0'
+		},
+		sunday:{
+			start: '15:00',
+			end: '16:00',
+			status: '0'
+		}
+	};

@@ -3,8 +3,8 @@
 module.exports = function(app, route){
 	//setup the controller
 	var rest = restful.model(
-	    'weather',
-	    app.models.weather
+	    'forecast',
+	    app.models.forecast
 	    ).methods(['get','put','post','delete']);
 
 	//regesiter this endpoint with the application
