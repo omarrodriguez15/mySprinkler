@@ -35,8 +35,8 @@ function putIp(){
 			ownerid: 'jsahd',
 			serialnumber: 'hsa89',
 			status: '0'
-		}, function(data) {
-			console.log('response:', data);
+		}, function(res) {
+			console.log('response:', res);
 		});
 		console.log('Post Ip Fired!');
 	});
@@ -54,8 +54,8 @@ function postIp(){
 			ownerid: 'jsahd',
 			serialnumber: 'hsa89',
 			status: '0'
-		}, function(data) {
-			console.log('response:', data);
+		}, function(res) {
+			console.log('response:', res);
 		});
 		console.log('Post Ip Fired!');
 	});
@@ -65,22 +65,55 @@ function postIp(){
 //save to local db
 function getWeather(){
 	var Weather = mongoose.model('weathers', models.weather);
-	performRequest('/api/condweather', 'GET', {}, 
-		function(data) {
-			var newWeather = new Weather(data);
-			newWeather.save(function(err){
-				if(err) console.log(err);
+	//Get the last document saved
+	Weather.find({}).sort({timestamp: -1}).exec(function(err,doc){
+		var data;
+		if(doc.length > 0){
+			console.log('Doc found: ',doc);
+			data = {
+				ownerid: '562baf9d7380040d4f27480c', 
+				timestamp: doc.timestamp
+				};
+			performRequest('/api/condweather', 'GET', data, 
+			function(res) {
+				console.log('response:', res,'response length: ',res.length);
+				if(res.length > 0){
+					var newWeather = new Weather(res);
+					
+					newWeather.save(function(err){
+						if(err) console.log(err);
+					});
+				}
 			});
-			console.log('response:', data);
-		});
+		}
+		else{//get first doc
+			console.log('no docs found');
+			data = {
+				ownerid:'562baf9d7380040d4f27480c',
+				timestamp: new Date().getTime()
+				};
+			
+			performRequest('/api/condweather', 'GET', data, 
+			function(res) {
+				var newWeather = new Weather(res);
+				
+				newWeather.save(function(err){
+					if(err) console.log(err);
+				});
+				console.log('response:', res);
+			});
+		}
+	});
+	
+	
 	console.log('Get Weather Fired!');
 }
 
 //For testing its sending a get request not post
 //Production should 
 function postSchedule(){
-	performRequest('/api/schedules', 'POST', testScheduleObject, function(data) {
-			console.log('response:', data);
+	performRequest('/api/schedules', 'POST', testScheduleObject, function(res) {
+			console.log('response:', res);
 		});
 	console.log('GET Schedules Fired!');
 }
@@ -90,16 +123,14 @@ function postSchedule(){
 function performRequest(endpoint, method, data, success) {
   var dataString = JSON.stringify(data);
   var headers = {};
-  /*
-  if (method == 'GET') {
+  
+  if (method == 'GET' && data !== {}) {
     endpoint += '?' + querystring.stringify(data);
   }
-  else {*/
-    headers = {
-      'Content-Type': 'application/json',
-      'Content-Length': dataString.length
-   // };
-   }
+  headers = {
+  	'Content-Type': 'application/json',
+	'Content-Length': dataString.length
+  };
   var options = {
 	host: host,
 	port: config.options.port,
@@ -107,18 +138,16 @@ function performRequest(endpoint, method, data, success) {
     method: method,
     headers: headers
   };
-
+  
   var req = http.request(options, function(res) {
     res.setEncoding('utf-8');
-
     var responseString = '';
-
+	
     res.on('data', function(data) {
       responseString += data;
     });
 
     res.on('end', function() {
-      console.log(responseString);
       var responseObject = JSON.parse(responseString);
       success(responseObject);
     });
@@ -128,6 +157,8 @@ function performRequest(endpoint, method, data, success) {
   req.end();
 }
 
+
+//Just for testing
 var testScheduleObject = {
 			monday:{
 			start: '15:00',

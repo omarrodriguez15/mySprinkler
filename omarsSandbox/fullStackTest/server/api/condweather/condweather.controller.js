@@ -5,10 +5,20 @@ var Condweather = require('./condweather.model');
 
 // Get list of condweathers
 exports.index = function(req, res) {
-  Condweather.find(function (err, condweathers) {
-    if(err) { return handleError(res, err); }
-    return res.status(200).json(condweathers);
-  });
+  if (Object.keys(req.query).length === 0){
+    Condweather.find(function (err, condweathers) {
+      if(err) { return handleError(res, err); }
+      return res.status(200).json(condweathers);
+    });
+  }
+  else if (typeof req.query.ownerid !== 'undefined' ){
+    //get the docs that are older than the timestamp passed in
+    Condweather.find({ownerid :req.query.ownerid}).where('timestamp').lt(parseInt(req.query.timestamp)).exec(function (err, condweathers) {
+      if(err) { return handleError(res, err); }
+      console.log(condweathers);
+      return res.status(200).json(condweathers);
+    });
+  }
 };
 
 // Get a single condweather

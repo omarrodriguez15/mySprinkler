@@ -22,6 +22,7 @@ function getCurrentWeather(callback) {
 	User.find({}, function(err, users){
 		//will need to ping weather for each user in the database
 		for (var i=0; i < users.length ;i++) {
+			var userId = users[i]._id.toString();
 			//make sure user has cordinates
 			if(typeof users[i].cord.lat === 'undefined') continue;
 			
@@ -29,11 +30,12 @@ function getCurrentWeather(callback) {
 			weather.get({ qs: { lat: users[i].cord.lat, lon: users[i].cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
 				if (error) return console.log(error);
 				
-				body.timestamp = new Date().toString();
+				body.timestamp = new Date().getTime();
 				var newWeather = new Weather(body);
 				
 				newWeather.save(function(err, res) {
 					if (err) return console.log(err);
+					res.ownerid = userId;
 					console.log('successfully ping of current weather and save');
 					//callback will condense and save in seperate collection
 					callback(res);
@@ -48,6 +50,9 @@ function createCondDoc(weatherRes){
 	_newCondWeather.temp = weatherRes.main.temp;
 	_newCondWeather.humidity = weatherRes.main.humidity;
 	_newCondWeather.windspeed = weatherRes.wind.speed;
+	_newCondWeather.ownerid = weatherRes.ownerid;
+	_newCondWeather.timestamp = weatherRes.timestamp;
+	_newCondWeather.grnd_level = weatherRes.main.grnd_level;
 	
 	//rain property only exist if it rained in pass 3 hours
 	_newCondWeather.rain = typeof weatherRes.rain === 'undefined'? '0': _newCondWeather.rain = weatherRes.rain['3h'];
