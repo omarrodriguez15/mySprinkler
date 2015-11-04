@@ -71,7 +71,53 @@ angular.module('fullStackTestApp')
               del.apply(event, args);
             });
           };
+        },
+        
+         /**
+         * My First Modal
+         * @param  {Function} del - callback, ran when delete is confirmed
+         * @return {Function}     - the function to open the modal (ex. myModalFn)
+         */
+          test: function(del) {
+          del = del || angular.noop;
+
+          /**
+           * Open a delete confirmation modal
+           * @param  {String} name   - name or info to show on modal
+           * @param  {All}           - any additional args are passed straight to del callback
+           */
+          return function() {
+            var args = Array.prototype.slice.call(arguments),
+                name = args.shift(),
+                testModal;
+
+            testModal = openModal({
+              modal: {
+                dismissable: true,
+                title: 'Testing Confirm',
+                html: '<p>Are you sure you want to do that?</p>',
+                buttons: [{
+                  classes: 'btn-success',
+                  text: 'Yes',
+                  click: function(e) {
+                    testModal.close(e);
+                  }
+                }, {
+                  classes: 'btn-default',
+                  text: 'Cancel',
+                  click: function(e) {
+                    testModal.dismiss(e);
+                  }
+                }]
+              }
+            }, 'modal-success');
+
+            testModal.result.then(function(event) {
+              del.apply(event, args);
+            });
+          };
         }
+        
       }
     };
   });
