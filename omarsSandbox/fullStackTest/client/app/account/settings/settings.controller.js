@@ -1,8 +1,12 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-  .controller('SettingsCtrl', function ($scope, User, Auth) {
+  .controller('SettingsCtrl', function ($scope, User, Auth, $location, $cookieStore) {
     $scope.errors = {};
+
+    if(!$cookieStore.get('token')) {
+      $location.path('/login');
+    }
 
     $scope.changePassword = function(form) {
       $scope.submitted = true;
@@ -18,4 +22,11 @@ angular.module('fullStackTestApp')
         });
       }
 		};
+
+    $scope.changeEmail = function(form) {
+      $scope.submitted = true;
+      if(form.$valid) {
+        // change email
+      }
+    };
   });

@@ -1,9 +1,13 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-  .controller('SignupCtrl', function ($scope, Auth, $location, $window) {
+  .controller('SignupCtrl', function ($scope, Auth, $location, $window, $cookieStore) {
     $scope.user = {};
     $scope.errors = {};
+
+    if($cookieStore.get('token')) {
+      $location.path('/');
+    }
 
     $scope.register = function(form) {
       $scope.submitted = true;

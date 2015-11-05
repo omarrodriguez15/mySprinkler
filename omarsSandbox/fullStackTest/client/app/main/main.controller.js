@@ -1,8 +1,12 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-  .controller('MainCtrl', function ($scope, $http, socket) {
+  .controller('MainCtrl', function ($scope, $http, socket, $location, $cookieStore) {
     $scope.awesomeThings = [];
+
+    if(!$cookieStore.get('token')) {
+      $location.path('/login');
+    }
 
     $http.get('/api/things').success(function(awesomeThings) {
       $scope.awesomeThings = awesomeThings;

@@ -1,7 +1,10 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-  .controller('AdminCtrl', function ($scope, $http, Auth, User) {
+  .controller('AdminCtrl', function ($scope, $http, Auth, User, $location, $cookieStore) {
+    if(!$cookieStore.get('token')) {
+      $location.path('/login');
+    }
 
     // Use the User $resource to fetch all users
     $scope.users = User.query();
