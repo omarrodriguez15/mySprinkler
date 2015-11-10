@@ -18,7 +18,7 @@ module.exports = {
 		setInterval(function(){
 			getWeather();
 			//postIp();
-		}, 5000);
+		}, 3600000);
 	}
 };
 

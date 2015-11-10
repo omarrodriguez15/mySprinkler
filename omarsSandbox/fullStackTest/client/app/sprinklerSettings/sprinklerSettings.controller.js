@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-  .controller('SprinklerSettingsCtrl', function ($scope, $cookieStore) {
+  .controller('SprinklerSettingsCtrl', function ($scope, $cookieStore, $location) {
     if(!$cookieStore.get('token')) {
       $location.path('/login');
     }
@@ -9,5 +9,5 @@ angular.module('fullStackTestApp')
     $scope.message = 'Hello';
     $scope.sprinklerOn = function() {
     	//sprinkleron
-    }
+    };
   });

@@ -22,25 +22,7 @@ function getCurrentWeather(callback) {
 	User.find({}, function(err, users){
 		//will need to ping weather for each user in the database
 		for (var i=0; i < users.length ;i++) {
-			var userId = users[i]._id.toString();
-			//make sure user has cordinates
-			if(typeof users[i].cord.lat === 'undefined') continue;
-			
-			//append the qs(query string of latitude and longitude)
-			weather.get({ qs: { lat: users[i].cord.lat, lon: users[i].cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
-				if (error) return console.log(error);
-				
-				body.timestamp = new Date().getTime();
-				var newWeather = new Weather(body);
-				
-				newWeather.save(function(err, res) {
-					if (err) return console.log(err);
-					res.ownerid = userId;
-					console.log('successfully ping of current weather and save');
-					//callback will condense and save in seperate collection
-					callback(res);
-				});
-			});
+			updateUsersWeather(users[i], callback);
 		}
 	});
 }
@@ -73,22 +55,48 @@ function getForecast() {
 		
 		//will need to ping weather for each user in the database
 		for (var i=0; i < users.length ;i++) {
-		//make sure user has cordinates
-		if(typeof users[i].cord.lat === 'undefined') continue;
+			updateUserForecast(users[i]);
+		}
+	});
+}
+
+function updateUsersWeather(user, callback){
+	var userId = user._id.toString();
+			//make sure user has cordinates
+			if(typeof user.cord.lat === 'undefined') return;
 			
 			//append the qs(query string of latitude and longitude)
-			weather.get({ qs: { lat: users[i].cord.lat, lon: users[i].cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
+			weather.get({ qs: { lat: user.cord.lat, lon: user.cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
 				if (error) return console.log(error);
 				
-				body.timestamp = new Date().toString();
-				var newForecast = new Forecast(body);
+				body.timestamp = new Date().getTime();
+				var newWeather = new Weather(body);
 				
-				newForecast.save(function(err, res) {
+				newWeather.save(function(err, res) {
 					if (err) return console.log(err);
-					console.log('successfully ping of weather forecast and save');
+					res.ownerid = userId;
+					console.log('successfully ping of current weather and save');
+					//callback will condense and save in seperate collection
+					callback(res);
 				});
 			});
-		}
+}
+
+function updateUserForecast(user){
+	//make sure user has cordinates
+	if(typeof user.cord.lat === 'undefined') return;
+		
+		//append the qs(query string of latitude and longitude)
+		weather.get({ qs: { lat: user.cord.lat, lon: user.cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
+			if (error) return console.log(error);
+			
+			body.timestamp = new Date().toString();
+			var newForecast = new Forecast(body);
+			
+			newForecast.save(function(err, res) {
+				if (err) return console.log(err);
+				console.log('successfully ping of weather forecast and save');
+			});
 	});
 }
 

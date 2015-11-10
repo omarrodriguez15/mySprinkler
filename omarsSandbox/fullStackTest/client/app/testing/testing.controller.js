@@ -12,7 +12,9 @@ angular.module('fullStackTestApp')
       var today = {sunday:{start: '15:00', end:'16:00',status:'0'}};
       
       $http.put('/api/schedules/'+id, today).success(function(res) {
-        if (res.length < 1) return console.log('no schedule found!');
+        if (res.length < 1) {
+          return console.log('no schedule found!');
+        }
         
         $scope.schedule = res;
         console.log(res);
@@ -25,13 +27,15 @@ angular.module('fullStackTestApp')
       var today = {sunday:{start: '15:00', end:'16:00',status:'1'}};
       
       $http.put('/api/schedules/'+id, today).success(function(res) {
-        if (res.length < 1) return console.log('no schedule found!');
+        if (res.length < 1) {
+          return console.log('no schedule found!');
+        }
         
         $scope.schedule = res;
         console.log(res);
       });
     };
     
-    $scope.delete = Modal.confirm.test(function(user){});
+    //$scope.delete = Modal.confirm.test(function(user){});
     
   });
