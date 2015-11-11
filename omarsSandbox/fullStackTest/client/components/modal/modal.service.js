@@ -88,7 +88,7 @@ angular.module('fullStackTestApp')
            */
           return function() {
             var args = Array.prototype.slice.call(arguments),
-                name = args.shift(),
+                //name = args.shift(),
                 testModal;
 
             testModal = openModal({

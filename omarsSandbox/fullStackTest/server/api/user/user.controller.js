@@ -41,8 +41,7 @@ exports.create = function (req, res, next) {
     if  (error) return console.log(error);
     var newSchedule = new Schedule(defaultSchedule);
     
-    if(typeof body.results !== 'undefined' 
-       && body.results.count > 0) {
+    if(typeof body.results !== 'undefined' && body.results.count > 0) {
       location = JSON.parse(body).results[0].geometry.location;
     }
     else{

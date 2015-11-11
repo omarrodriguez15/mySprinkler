@@ -16,6 +16,8 @@ exports.register = function(socket) {
 }
 
 function onSave(socket, doc, cb) {
+  //send updates to the pi!
+  
   socket.emit('schedule:save', doc);
 }
 
