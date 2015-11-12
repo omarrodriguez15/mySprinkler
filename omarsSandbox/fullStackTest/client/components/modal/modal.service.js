@@ -116,8 +116,87 @@ angular.module('fullStackTestApp')
               del.apply(event, args);
             });
           };
-        }
+        },
         
+        on: function(del) {
+          del = del || angular.noop;
+
+          /**
+           * Open an on confirmation modal
+           * @param  {String} name   - name or info to show on modal
+           * @param  {All}           - any additional args are passed straight to del callback
+           */
+          return function() {
+            var args = Array.prototype.slice.call(arguments),
+                name = args.shift(),
+                onModal;
+
+            onModal = openModal({
+              modal: {
+                dismissable: true,
+                title: 'Confirm',
+                html: '<p>Are you sure you want to turn <strong> on <strong> the sprinkler system?</p>',
+                buttons: [{
+                  classes: 'btn-success',
+                  text: 'Yes',
+                  click: function(e) {
+                    onModal.close(e);
+                  }
+                }, {
+                  classes: 'btn-default',
+                  text: 'Cancel',
+                  click: function(e) {
+                    onModal.dismiss(e);
+                  }
+                }]
+              }
+            }, 'modal-success');
+
+            onModal.result.then(function(event) {
+              del.apply(event, args);
+            });
+          };
+        },
+
+        off: function(del) {
+          del = del || angular.noop;
+
+          /**
+           * Open an on confirmation modal
+           * @param  {String} name   - name or info to show on modal
+           * @param  {All}           - any additional args are passed straight to del callback
+           */
+          return function() {
+            var args = Array.prototype.slice.call(arguments),
+                name = args.shift(),
+                offModal;
+
+            offModal = openModal({
+              modal: {
+                dismissable: true,
+                title: 'Confirm',
+                html: '<p>Are you sure you want to turn <strong> off <strong> the sprinkler system?</p>',
+                buttons: [{
+                  classes: 'btn-success',
+                  text: 'Yes',
+                  click: function(e) {
+                    offModal.close(e);
+                  }
+                }, {
+                  classes: 'btn-default',
+                  text: 'Cancel',
+                  click: function(e) {
+                    offModal.dismiss(e);
+                  }
+                }]
+              }
+            }, 'modal-success');
+
+            offModal.result.then(function(event) {
+              del.apply(event, args);
+            });
+          };
+        }
       }
     };
   });
