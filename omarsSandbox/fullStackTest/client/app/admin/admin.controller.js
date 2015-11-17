@@ -2,7 +2,7 @@
 
 angular.module('fullStackTestApp')
   .controller('AdminCtrl', function ($scope, $http, Auth, User, $location, $cookieStore) {
-    if(!$cookieStore.get('token')) {
+    if(!Auth.isLoggedIn()) {
       $location.path('/login');
     }
 

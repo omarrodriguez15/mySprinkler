@@ -5,7 +5,7 @@ angular.module('fullStackTestApp')
     $scope.user = {};
     $scope.errors = {};
 
-    if($cookieStore.get('token')) {
+    if(Auth.isLoggedIn()) {
       $location.path('/');
     }
 

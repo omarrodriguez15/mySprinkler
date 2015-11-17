@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-  .controller('TestingCtrl', function ($scope, Modal, $http, $location, $cookieStore) {
-    if(!$cookieStore.get('token')) {
+  .controller('TestingCtrl', function ($scope, Modal, $http, $location, $cookieStore, Auth) {
+    if(!Auth.isLoggedIn()) {
       $location.path('/login');
     }
     

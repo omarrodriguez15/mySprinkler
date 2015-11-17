@@ -4,7 +4,7 @@ angular.module('fullStackTestApp')
   .controller('SettingsCtrl', function ($scope, User, Auth, $location, $cookieStore) {
     $scope.errors = {};
 
-    if(!$cookieStore.get('token')) {
+    if(!Auth.isLoggedIn()) {
       $location.path('/login');
     }
 
