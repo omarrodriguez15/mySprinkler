@@ -1,6 +1,7 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
+//var socket = require('socket.io-client')('http://localhost:9000');
 var methodOverride = require('method-override');
 var _ = require('lodash');
 var services = require('./components/service');
@@ -26,6 +27,10 @@ app.use('/hello',function(req, res, next){
 	services.beginTimer();
 	next();
 });
+
+/*socket.on('connect', function(){
+	console.log('Pong');
+})*/
 
 //Connect to MongoDB
 mongoose.connect('mongodb://localhost/mySprinkler');

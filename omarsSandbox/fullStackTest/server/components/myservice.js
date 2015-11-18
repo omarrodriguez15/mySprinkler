@@ -34,8 +34,11 @@ function createCondDoc(weatherRes){
 	_newCondWeather.windspeed = weatherRes.wind.speed;
 	_newCondWeather.ownerid = weatherRes.ownerid;
 	_newCondWeather.timestamp = weatherRes.timestamp;
-	_newCondWeather.grnd_level = weatherRes.main.grnd_level;
-	
+	_newCondWeather.pressure = weatherRes.main.grnd_level;//pressure at grnd lvl
+	_newCondWeather.latitude = weatherRes.coord.lat;
+	_newCondWeather.temp_min = weatherRes.main.temp_min;
+	_newCondWeather.temp_max = weatherRes.main.temp_max;
+	_newCondWeather.elevation = '112';//367ft or 112 m
 	//rain property only exist if it rained in pass 3 hours
 	_newCondWeather.rain = typeof weatherRes.rain === 'undefined'? '0': _newCondWeather.rain = weatherRes.rain['3h'];
 	
@@ -83,6 +86,7 @@ function updateUsersWeather(user, callback){
 }
 
 function updateUserForecast(user){
+	var userId = user._id.toString();
 	//make sure user has cordinates
 	if(typeof user.cord.lat === 'undefined') return;
 		
@@ -91,6 +95,7 @@ function updateUserForecast(user){
 			if (error) return console.log(error);
 			
 			body.timestamp = new Date().toString();
+			body.ownerid = userId;
 			var newForecast = new Forecast(body);
 			
 			newForecast.save(function(err, res) {

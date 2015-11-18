@@ -5,10 +5,21 @@ var Forecast = require('./forecast.model');
 
 // Get list of forecasts
 exports.index = function(req, res) {
-  Forecast.find(function (err, forecasts) {
-    if(err) { return handleError(res, err); }
-    return res.status(200).json(forecasts);
-  });
+  if (Object.keys(req.query).length === 0){
+    Forecast.find(function (err, forecasts) {
+      if(err) { return handleError(res, err); }
+      return res.status(200).json(forecasts);
+    });
+  }
+  else if (typeof req.query.ownerid !== 'undefined' ){
+    //get docs older than timestamp
+    Forecast.find({ownerid :req.query.ownerid}).where('timestamp').lt(parseInt(req.query.timestamp)).exec(function (err, forecasts) {
+      if (err) {return handleError(res, err); }
+      console.log(forecasts);
+      return res.status(200).json(forecasts);
+    });
+  }
+  
 };
 
 // Get a single forecast
