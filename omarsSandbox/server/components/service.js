@@ -16,31 +16,97 @@ module.exports = {
 	beginTimer : function(){
 		//3600000 miliseconds is an hour
 		setInterval(function(){
-			getWeather();
+			getStatus();
+		}, 5000);
+		//3600000 miliseconds is an hour
+		setInterval(function(){
+			getSchedule();
 			//postIp();
 		}, 3600000);
+		
+		//3 hours = 10800000 milliseconds
+		setInterval(function(){
+			getWeather();
+		}, 10800000);
+		
+		//86400000 miliseconds in a day
+		//604800000 in 7 days	 
+		setInterval(function(){
+	 		getForecast();
+		}, 604800000);
 	}
 };
 
-//Needs to get current IP address and PUT it to
-//the web server pi collection by using its object ID to find
-//the correct document
-function putIp(){
-	//'Content-Type': 'application/x-www-form-urlencoded'
-	require('dns').lookup(require('os').hostname(), function (err, add, fam) {
-		console.log('addr: '+add);
-		performRequest('/api/pis', 'POST', {
-			ip: add,
-			name: 'test',
-			ownerid: 'jsahd',
-			serialnumber: 'hsa89',
-			status: '0'
-		}, function(res) {
-			console.log('response:', res);
+//Get schedule from webserver to check status
+function getStatus(){
+	console.log('getStatus');
+	performRequest('/api/schedules/'+'564950e26c2e114e17392b95','GET',{},function(res){
+		console.log('Response: '+res.sunday.status);
+		//TODO:
+		//if 1 fire py script
+		//path to script
+		var path = '/Users/jabba/Desktop/test.py';
+		var py = require('child_process').spawn('python', [path]);
+
+		py.stdout.on('data', function (data) {
+			console.log('stdout: ' + data);
 		});
-		console.log('Post Ip Fired!');
 	});
-	console.log('PUT Pi info Fired!');
+}
+
+//TODO:hardcoded id
+//Get schedule from webserver to update schedule if necessary
+function getSchedule(){
+	console.log('getSchedule');
+	performRequest('/api/schedules/'+'564950e26c2e114e17392b95','GET',{},function(res){
+		console.log('Response: '+res.sunday.status);
+		//check if different from current schedule
+		//if different write to db
+	});
+}
+//TODO:hardcoded id
+//Get schedule from webserver to check status
+function getForecast(){
+	 var Forecast = mongoose.model('forecasts', models.forecast);
+	//Get the last document saved
+	Forecast.find({}).sort({timestamp: -1}).exec(function(err,doc){
+		var data;
+		if(doc.length > 0){
+			console.log('Doc found: ',doc);
+			data = {
+				ownerid: '562baf9d7380040d4f27480c', 
+				timestamp: doc.timestamp
+				};
+			performRequest('/api/forecasts', 'GET', data, 
+			function(res) {
+				console.log('response:', res,'response length: ',res.length);
+				if(res.length > 0){
+					var newForecast = new Forecast(res);
+					
+					newForecast.save(function(err){
+						if(err) console.log(err);
+					});
+				}
+			});
+		}
+		else{//get first doc
+			console.log('no docs found');
+			data = {
+				ownerid:'562baf9d7380040d4f27480c',
+				timestamp: new Date().getTime()
+				};
+			
+			performRequest('/api/forecasts', 'GET', data, 
+			function(res) {
+				var newForecast = new Forecast(res);
+				
+				newForecast.save(function(err){
+					if(err) console.log(err);
+				});
+				console.log('response:', res);
+			});
+		}
+	});
 }
 
 //If first time need to create document which includes serial number of pi
@@ -157,6 +223,27 @@ function performRequest(endpoint, method, data, success) {
   req.end();
 }
 
+
+//Needs to get current IP address and PUT it to
+//the web server pi collection by using its object ID to find
+//the correct document
+function putIp(){
+	//'Content-Type': 'application/x-www-form-urlencoded'
+	require('dns').lookup(require('os').hostname(), function (err, add, fam) {
+		console.log('addr: '+add);
+		performRequest('/api/pis', 'POST', {
+			ip: add,
+			name: 'test',
+			ownerid: 'jsahd',
+			serialnumber: 'hsa89',
+			status: '0'
+		}, function(res) {
+			console.log('response:', res);
+		});
+		console.log('Post Ip Fired!');
+	});
+	console.log('PUT Pi info Fired!');
+}
 
 //Just for testing
 var testScheduleObject = {
