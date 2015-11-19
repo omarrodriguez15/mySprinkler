@@ -8,14 +8,18 @@
 
 
 <div style="text-align: center; padding: 25px 25px 25px 25px;">
-  <div class="text-align: center;" ng-model="status"> <p><h2>Current Status: {{status}}</h2></p></div>
-  <div class="checkbox" style="text-align: center;">
+  <div style="margin: 0 auto;" ng-model="status"> <p><h2>Current Status: {{status}}</h2></p></div>
+  <div class="checkbox" style="margin: 0 auto;">
     <input id="main" type="checkbox" style="margin: auto;" data-toggle="toggle" 
       data-width="300" data-height="150" 
       data-onstyle="success" data-offstyle="danger"
       data-on="Turn Sprinkler OFF" data-off="Turn Sprinkler ON" 
       main-toggle>
   </div>
+</div>
+
+<div style="text-align: center;">
+  <weather class="weatherFeed" style="margin: 0 auto; width: 50%;"></weather>
 </div>
 <!--
 <div class="container">
@@ -40,7 +44,6 @@
   </form>
 </div>
 -->
-<img src="../assets/images/weather.png" class="img-rounded center-block img-responsive" alt="Responsive image">
 
 <!-- <script>  
   $("#main").bootstrapToggle();

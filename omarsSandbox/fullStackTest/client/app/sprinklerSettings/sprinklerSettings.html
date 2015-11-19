@@ -15,7 +15,7 @@
       <form class="form" name="form" ng-submit="submit(form)" novalidate>
       	<div class="form-group">
 			<label>Watering Type</label>
-			<select class="form-control">
+			<select id="wateringtype" class="form-control">
 			  <option value="Recommended">Recommended</option>
 			  <option value="Economical">Economical</option>
 			</select>
@@ -24,18 +24,18 @@
       	<div class="form-group">
       		<label>Number of Zones</label>
       		<br>
-      		<input class="form-control" id="zones" type="text" data-slider-min="0" data-slider-max="8" data-slider-step="1" data-slider-value="3"/>
+      		<input class="form-control" id="numberofzones" type="text" data-slider-min="0" data-slider-max="8" data-slider-step="1" data-slider-value="3"/>
       	</div>
 
       	<div class="form-group">
       		<label>Water Threshold</label>
       		<br>
-      		<input class="form-control" id="threshold" type="text" data-slider-min="0" data-slider-max="5" data-slider-step="0.25" data-slider-value="2.5"/>
+      		<input class="form-control" id="wateringthreshold" type="text" data-slider-min="0" data-slider-max="5" data-slider-step="0.25" data-slider-value="2.5"/>
       	</div>
 
 		<div class="form-group">
 			<label>Soil Type</label>
-			<select class="form-control">
+			<select id="soiltype" class="form-control">
 			  <option value="Loam">Loam</option>
 			  <option value="Sandy">Sandy</option>
 			  <option value="Silty">Silty</option>
@@ -47,7 +47,7 @@
 
 		<div class="form-group">
 			<label>Plant Type</label>
-			<select class="form-control">
+			<select id="planttype" class="form-control">
 			  <option value="Grass">Grass</option>
 			  <option value="Cactus">Cactus</option>
 			  <option value="Bean">Bean</option>
@@ -59,11 +59,11 @@
 
 		
 		<div class="form-group">
-			<input type="checkbox" name="vehicle" value="Car"> Shaded Area<br>
+			<input id="shadedarea" type="checkbox" name="vehicle" value="Car"> Shaded Area<br>
 		</div>
 
 		<div class="form-group">
-			<input type="checkbox" name="vehicle" value="Car"> Sloped Area<br>
+			<input id="slopedarea" type="checkbox" name="vehicle" value="Car"> Sloped Area<br>
 		</div>
         <button class="btn btn-primary" type="submit">Save changes</button>
       </form>

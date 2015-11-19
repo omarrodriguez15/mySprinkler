@@ -22,11 +22,4 @@ angular.module('fullStackTestApp')
         });
       }
 		};
-
-    $scope.changeEmail = function(form) {
-      $scope.submitted = true;
-      if(form.$valid) {
-        // change email
-      }
-    };
   });

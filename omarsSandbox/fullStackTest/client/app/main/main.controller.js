@@ -17,8 +17,9 @@ angular.module('fullStackTestApp')
     });
 
 
-    //http get current status of sprinkler
+    //replace with http get current status of sprinkler
     $scope.status = 'ON';
+    //end http get
 
     $scope.addThing = function() {
       if($scope.newThing === '') {
