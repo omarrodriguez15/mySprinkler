@@ -17,7 +17,7 @@ var weather = require('request').defaults({
 });
 
 function getCurrentWeather(callback) {
-	weather.url = currentWeather;
+	
 	//test lat and lon
 	User.find({}, function(err, users){
 		//will need to ping weather for each user in the database
@@ -53,8 +53,6 @@ function createCondDoc(weatherRes){
 function getForecast() {
 	//Get all users
 	User.find({}, function(err, users){
-		//make sure url for getting forecast correct
-		weather.url = forecast;
 		
 		//will need to ping weather for each user in the database
 		for (var i=0; i < users.length ;i++) {
@@ -65,24 +63,31 @@ function getForecast() {
 
 function updateUsersWeather(user, callback){
 	var userId = user._id.toString();
-			//make sure user has cordinates
-			if(typeof user.cord.lat === 'undefined') return;
-			
-			//append the qs(query string of latitude and longitude)
-			weather.get({ qs: { lat: user.cord.lat, lon: user.cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
-				if (error) return console.log(error);
-				
-				body.timestamp = new Date().getTime();
-				var newWeather = new Weather(body);
-				
-				newWeather.save(function(err, res) {
-					if (err) return console.log(err);
-					res.ownerid = userId;
-					console.log('successfully ping of current weather and save');
-					//callback will condense and save in seperate collection
-					callback(res);
-				});
-			});
+	//make sure user has cordinates
+	if(typeof user.cord.lat === 'undefined') return;
+	
+	//Open Weather API
+	//Doc: http://openweathermap.org/current#geo
+	var weather = require('request').defaults({
+		url: currentWeather,
+		json: true
+	});
+
+	//append the qs(query string of latitude and longitude)
+	weather.get({ qs: { lat: user.cord.lat, lon: user.cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
+		if (error) return console.log(error);
+		
+		body.timestamp = new Date().getTime();
+		var newWeather = new Weather(body);
+		
+		newWeather.save(function(err, res) {
+			if (err) return console.log(err);
+			res.ownerid = userId;
+			console.log('successfully ping of current weather and save');
+			//callback will condense and save in seperate collection
+			callback(res);
+		});
+	});
 }
 
 function updateUserForecast(user){
@@ -90,14 +95,22 @@ function updateUserForecast(user){
 	//make sure user has cordinates
 	if(typeof user.cord.lat === 'undefined') return;
 		
+		//Open Weather API
+		//Doc: http://openweathermap.org/current#geo
+		var weather = require('request').defaults({
+			url: forecast,
+			json: true
+		});
+		
 		//append the qs(query string of latitude and longitude)
 		weather.get({ qs: { lat: user.cord.lat, lon: user.cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
 			if (error) return console.log(error);
 			
 			body.timestamp = new Date().toString();
 			body.ownerid = userId;
-			var newForecast = new Forecast(body);
 			
+			var newForecast = new Forecast(body);
+
 			newForecast.save(function(err, res) {
 				if (err) return console.log(err);
 				console.log('successfully ping of weather forecast and save');
