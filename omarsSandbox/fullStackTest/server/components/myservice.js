@@ -106,7 +106,7 @@ function updateUserForecast(user){
 		weather.get({ qs: { lat: user.cord.lat, lon: user.cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
 			if (error) return console.log(error);
 			
-			body.timestamp = new Date().toString();
+			body.timestamp = new Date().getTime();
 			body.ownerid = userId;
 			
 			var newForecast = new Forecast(body);

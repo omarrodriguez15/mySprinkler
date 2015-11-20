@@ -12,12 +12,16 @@ var scheduleSchema = require('../models/schedule');
 var schedule = mongoose.model('schedule', scheduleSchema);
 */
 
+//TODO dont make this hardcoded
+var globalOwnerId = '564950df6c2e114e17392b94';
+var schedulesId = '564950e26c2e114e17392b95';
+
 module.exports = {
 	beginTimer : function(){
 		//3600000 miliseconds is an hour
 		setInterval(function(){
 			getStatus();
-		}, 5000);
+		}, 3600000);
 		//3600000 miliseconds is an hour
 		setInterval(function(){
 			getSchedule();
@@ -37,10 +41,11 @@ module.exports = {
 	}
 };
 
+//TODO:ScheduleId hardcoded
 //Get schedule from webserver to check status
 function getStatus(){
 	console.log('getStatus');
-	performRequest('/api/schedules/'+'564950e26c2e114e17392b95','GET',{},function(res){
+	performRequest('/api/schedules/'+schedulesId,'GET',{},function(res){
 		console.log('Response: '+res.sunday.status);
 		//TODO:
 		//if 1 fire py script
@@ -54,11 +59,23 @@ function getStatus(){
 	});
 }
 
+//TODO:Get user info No api endpoint yet
+function getUserProfile(){
+	var Pi = mongoose.model('Pi', models.pi);
+	var pi_info = Pi.find({});
+	
+	console.log('getUserProfile');
+	
+	performRequest('/api/publicUser/'+pi_info.userId,'GET',{},function(res){
+		console.log('Response: '+ res);
+	});
+}
+
 //TODO:hardcoded id
 //Get schedule from webserver to update schedule if necessary
 function getSchedule(){
 	console.log('getSchedule');
-	performRequest('/api/schedules/'+'564950e26c2e114e17392b95','GET',{},function(res){
+	performRequest('/api/schedules/'+schedulesId,'GET',{},function(res){
 		console.log('Response: '+res.sunday.status);
 		//check if different from current schedule
 		//if different write to db
@@ -74,7 +91,7 @@ function getForecast(){
 		if(doc.length > 0){
 			console.log('Doc found: ',doc);
 			data = {
-				ownerid: '562baf9d7380040d4f27480c', 
+				ownerid: globalOwnerId, 
 				timestamp: doc.timestamp
 				};
 			performRequest('/api/forecasts', 'GET', data, 
@@ -90,9 +107,9 @@ function getForecast(){
 			});
 		}
 		else{//get first doc
-			console.log('no docs found');
+			console.log('Forecast no docs found');
 			data = {
-				ownerid:'562baf9d7380040d4f27480c',
+				ownerid: globalOwnerId,
 				timestamp: new Date().getTime()
 				};
 			
@@ -103,7 +120,7 @@ function getForecast(){
 				newForecast.save(function(err){
 					if(err) console.log(err);
 				});
-				console.log('response:', res);
+				console.log('Forecast response:', res);
 			});
 		}
 	});
@@ -137,7 +154,7 @@ function getWeather(){
 		if(doc.length > 0){
 			console.log('Doc found: ',doc);
 			data = {
-				ownerid: '562baf9d7380040d4f27480c', 
+				ownerid: globalOwnerId, 
 				timestamp: doc.timestamp
 				};
 			performRequest('/api/condweather', 'GET', data, 
@@ -155,7 +172,7 @@ function getWeather(){
 		else{//get first doc
 			console.log('no docs found');
 			data = {
-				ownerid:'562baf9d7380040d4f27480c',
+				ownerid: globalOwnerId,
 				timestamp: new Date().getTime()
 				};
 			
