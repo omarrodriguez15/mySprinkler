@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-  .controller('AdminCtrl', function ($scope, $http, Auth, User, $location, $cookieStore) {
+  .controller('AdminCtrl', function ($scope, $http, Auth, User, $location) {
     if(!Auth.isLoggedIn()) {
       $location.path('/login');
     }

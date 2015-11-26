@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-  .controller('SettingsCtrl', function ($scope, User, Auth, $location, $cookieStore) {
+  .controller('SettingsCtrl', function ($scope, User, Auth, $location) {
     $scope.errors = {};
 
     if(!Auth.isLoggedIn()) {

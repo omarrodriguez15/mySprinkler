@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-  .controller('MainCtrl', function ($scope, $http, Auth, socket, $location, $cookieStore) {
+  .controller('MainCtrl', function ($scope, $http, Auth, socket, $location) {
     $scope.awesomeThings = [];
 
     if(!Auth.isLoggedIn()) {

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-  .controller('SprinklerSettingsCtrl', function ($scope, $cookieStore, Auth, Modal, $http) {
+  .controller('SprinklerSettingsCtrl', function ($scope, $cookieStore, Auth, Modal, $http, $location) {
     if(!Auth.isLoggedIn()) {
       $location.path('/login');
     }
@@ -9,17 +9,19 @@ angular.module('fullStackTestApp')
     var user = Auth.getCurrentUser();
     console.log(user);
     
-    $('#numberofzones').slider({
+    /*
+    jQuery('#numberofzones').slider({
       formatter: function(value) {
         return (value);
       }
     });
 
-    $('#wateringthreshold').slider({
+    jQuery('#wateringthreshold').slider({
       formatter: function(value) {
         return (value + ' in');
       }
     });
+    */
 
     $http.get('/api/settings/'+user.settingId).success(function(res) {
       if (res.length < 1) {
@@ -31,30 +33,31 @@ angular.module('fullStackTestApp')
 
     $scope.submit = function(form) {
       $scope.submitted = true;
-      console.log($('wateringtype').val());
+      console.log(jQuery('wateringtype').val());
       if(form.$valid) {
         $http.put('/api/settings/'+user.settingId, {
-            wateringtype : $("#wateringtype").val(),
-            numberofzones : $("#numberofzones").val(),
-            wateringthreshold : $("#wateringthreshold").val(),
-            soiltype : $("#soiltype").val(),
-            planttype : $("#planttype").val(),
-            shadedarea : $("#shadedarea").prop("checked"),
-            slopedarea : $("#slopedarea").prop("checked") 
+            wateringtype : jQuery('#wateringtype').val(),
+            numberofzones : jQuery('#numberofzones').val(),
+            wateringthreshold : jQuery('#wateringthreshold').val(),
+            soiltype : jQuery('#soiltype').val(),
+            planttype : jQuery('#planttype').val(),
+            shadedarea : jQuery('#shadedarea').prop('checked'),
+            slopedarea : jQuery('#slopedarea').prop('checked') 
           })
           .success(function(res) {
+            console.log('res: '+res);
             $scope.message = 'Settings saved successfully.';
           });
       }
     };
 
     function updateSettings(settings) {
-        $("#wateringtype").val(settings.wateringtype);
-        $("#numberofzones").slider('setValue', Number(settings.numberofzones));
-        $("#wateringthreshold").slider('setValue', Number(settings.wateringthreshold));
-        $("#soiltype").val(settings.soiltype);
-        $("#planttype").val(settings.planttype);
-        $("#shadedarea").prop("checked", settings.shadedarea);
-        $("#slopedarea").prop("checked", settings.slopedarea);
+        jQuery('#wateringtype').val(settings.wateringtype);
+        jQuery('#numberofzones').slider('setValue', Number(settings.numberofzones));
+        jQuery('#wateringthreshold').slider('setValue', Number(settings.wateringthreshold));
+        jQuery('#soiltype').val(settings.soiltype);
+        jQuery('#planttype').val(settings.planttype);
+        jQuery('#shadedarea').prop('checked', settings.shadedarea);
+        jQuery('#slopedarea').prop('checked', settings.slopedarea);
     }
   });

@@ -1,11 +1,13 @@
+'use strict';
+
 angular.module('fullStackTestApp')
 	.directive('mainToggle', function() {
 		return {
 			restrict: 'A',
-			link: function (scope, element, attrs) {
+			link: function (scope, element) {
 				element.bootstrapToggle(scope.status.toLowerCase());
 				element.on('change', function() {
-					if(scope.status == 'OFF') {
+					if(scope.status === 'OFF') {
 						scope.status = 'ON';
 					} else {
 						scope.status = 'OFF';
@@ -21,7 +23,7 @@ angular.module('fullStackTestApp')
 	.directive('weather', function() {
 		return {
 			restrict: 'E',
-			link: function (scope, element, attrs) {
+			link: function (scope, element) {
 				element.weatherfeed(['UKXX0085','EGXX0011','UKXX0061','CAXX0518','CHXX0049']);
 			}
 		};

@@ -128,7 +128,7 @@ angular.module('fullStackTestApp')
            */
           return function() {
             var args = Array.prototype.slice.call(arguments),
-                name = args.shift(),
+                //name = args.shift(),
                 onModal;
 
             onModal = openModal({
@@ -168,7 +168,7 @@ angular.module('fullStackTestApp')
            */
           return function() {
             var args = Array.prototype.slice.call(arguments),
-                name = args.shift(),
+                //name = args.shift(),
                 offModal;
 
             offModal = openModal({

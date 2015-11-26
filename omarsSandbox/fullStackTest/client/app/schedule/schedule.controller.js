@@ -1,5 +1,46 @@
 'use strict';
-var week, times;
+
+var week = [
+      {
+        day:'Monday'
+      },
+      {
+        day:'Tuesday'
+      },
+      {
+        day:'Wednesday'
+      },
+      {
+        day:'Thursday'
+      },
+      {
+        day:'Friday'
+      },
+      {
+        day:'Saturday'
+      },
+      {
+        day:'Sunday'
+      }
+      ];
+      
+var times = ['12:00 AM','01:00 AM','02:00 AM','03:00 AM','04:00 AM','05:00 AM','06:00 AM','07:00 AM','08:00 AM','09:00 AM',
+        '10:00 AM','11:00 AM','12:00 PM','01:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM','06:00 PM','07:00 PM',
+        '08:00 PM','09:00 PM','10:00 PM', '11:00 PM'];
+        
+function createScheduleArray(sched, cb){
+  var newWeek = week;
+  for(var i = 0; i < week.length ; i++){
+    var day = week[0].day.toString().toLowerCase();
+    
+    newWeek[i].start = sched[day].start;
+    newWeek[i].end = sched[day].end;
+  }
+  //send back new week object
+  cb(newWeek);
+}
+        
+        
 angular.module('fullStackTestApp')
   .controller('ScheduleCtrl', function ($scope, $location, $cookieStore, $http, Auth) {
     //check if user is logged in
@@ -23,43 +64,3 @@ angular.module('fullStackTestApp')
       
     });
   });
-
-function createScheduleArray(sched, cb){
-  var newWeek = week;
-  for(var i = 0; i < week.length ; i++){
-    var day = week[0].day.toString().toLowerCase();
-    
-    newWeek[i].start = sched[day].start;
-    newWeek[i].end = sched[day].end;
-  }
-  //send back new week object
-  cb(newWeek);
-}
-
-
-week = [
-      {
-        day:'Monday'
-      },
-      {
-        day:'Tuesday'
-      },
-      {
-        day:'Wednesday'
-      },
-      {
-        day:'Thursday'
-      },
-      {
-        day:'Friday'
-      },
-      {
-        day:'Saturday'
-      },
-      {
-        day:'Sunday'
-      }
-      ];
-times = ['12:00 AM','01:00 AM','02:00 AM','03:00 AM','04:00 AM','05:00 AM','06:00 AM','07:00 AM','08:00 AM','09:00 AM',
-        '10:00 AM','11:00 AM','12:00 PM','01:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM','06:00 PM','07:00 PM',
-        '08:00 PM','09:00 PM','10:00 PM', '11:00 PM'];
