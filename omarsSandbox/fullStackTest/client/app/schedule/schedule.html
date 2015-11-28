@@ -27,8 +27,14 @@
   </div>
 </div>
 
-
-<footer class="footer">
-  <div class="container">
+<div ng-if="noPi" class="jumbotron">
+  <h2>Enter you mySprinkler Serial Number</h2>
+  <div class="col-sm-4">
+    <div class="input-group">
+      <span class="input-group-btn">
+        <button class="btn btn-default" ng-click="register(piId)" type="button">Register!</button>
+      </span>
+      <input type="text" class="form-control" ng-model="piId" placeholder="Search for...">
+    </div>
   </div>
-</footer>
+</div>

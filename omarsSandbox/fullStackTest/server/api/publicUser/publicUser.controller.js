@@ -30,12 +30,13 @@ exports.create = function(req, res) {
   });
 };
 
-// Updates an existing publicUser in the DB.
+// Updates an existing User in the DB.
 exports.update = function(req, res) {
   if(req.body._id) { delete req.body._id; }
-  PublicUser.findById(req.params.id, function (err, publicUser) {
+  User.findById(req.params.id, function (err, publicUser) {
     if (err) { return handleError(res, err); }
     if(!publicUser) { return res.status(404).send('Not Found'); }
+    console.log('update body: '+ req.body);
     var updated = _.merge(publicUser, req.body);
     updated.save(function (err) {
       if (err) { return handleError(res, err); }

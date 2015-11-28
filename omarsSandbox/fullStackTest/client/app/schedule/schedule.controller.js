@@ -42,25 +42,40 @@ function createScheduleArray(sched, cb){
         
         
 angular.module('fullStackTestApp')
-  .controller('ScheduleCtrl', function ($scope, $location, $cookieStore, $http, Auth) {
+  .controller('ScheduleCtrl', function ($scope, $location, $cookieStore, $http, Auth, $route) {
+    $scope.noPi = false;
+    
     //check if user is logged in
     if(!Auth.isLoggedIn()) {
       $location.path('/login');
     }
+    
     //Grab user info stored in cookie
     var user = Auth.getCurrentUser();
     console.log(user);
     
-    $http.get('/api/schedules/'+user.schedId).success(function(res) {
-      if (res.length < 1) {
-        return console.log('no schedule found!');
-      }
-      console.log(res);
-      
-      createScheduleArray(res, function(newWeek){
-        $scope.times = times;
-        $scope.week = newWeek;
+    if (user.piId === '' ){
+      $scope.noPi = true;
+      $scope.register = function(txtPiId){
+        console.log('passed value: '+txtPiId);
+        $http.put('/api/publicUsers/'+user._id,{piId : txtPiId}).success(function(res){
+          console.log('success');
+          $route.reload();
+        });
+      };
+    }
+    else{
+      $http.get('/api/schedules/'+user.schedId).success(function(res) {
+        if (res.length < 1) {
+          return console.log('no schedule found!');
+        }
+        console.log(res);
+        
+        createScheduleArray(res, function(newWeek){
+          $scope.times = times;
+          $scope.week = newWeek;
+        });
+        
       });
-      
-    });
+    }
   });
