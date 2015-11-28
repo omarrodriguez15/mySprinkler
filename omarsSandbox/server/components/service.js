@@ -12,10 +12,6 @@ var scheduleSchema = require('../models/schedule');
 var schedule = mongoose.model('schedule', scheduleSchema);
 */
 
-//TODO dont make this hardcoded
-var globalOwnerId = '564950df6c2e114e17392b94';
-var schedulesId = '564950e26c2e114e17392b95';
-
 module.exports = {
 	beginTimer : function(){
 		//3600000 miliseconds is an hour
@@ -45,7 +41,7 @@ module.exports = {
 //Get schedule from webserver to check status
 function getStatus(){
 	console.log('getStatus');
-	performRequest('/api/schedules/'+schedulesId,'GET',{},function(res){
+	performRequest('/api/schedules/'+config.schedulesId,'GET',{},function(res){
 		console.log('Response: '+res.sunday.status);
 		//TODO:
 		//if 1 fire py script
@@ -75,7 +71,7 @@ function getUserProfile(){
 //Get schedule from webserver to update schedule if necessary
 function getSchedule(){
 	console.log('getSchedule');
-	performRequest('/api/schedules/'+schedulesId,'GET',{},function(res){
+	performRequest('/api/schedules/'+config.schedulesId,'GET',{},function(res){
 		console.log('Response: '+res.sunday.status);
 		//check if different from current schedule
 		//if different write to db
@@ -91,7 +87,7 @@ function getForecast(){
 		if(doc.length > 0){
 			console.log('Doc found: ',doc);
 			data = {
-				ownerid: globalOwnerId, 
+				ownerid: config.userId, 
 				timestamp: doc.timestamp
 				};
 			performRequest('/api/forecasts', 'GET', data, 
@@ -109,7 +105,7 @@ function getForecast(){
 		else{//get first doc
 			console.log('Forecast no docs found');
 			data = {
-				ownerid: globalOwnerId,
+				ownerid: config.userId,
 				timestamp: new Date().getTime()
 				};
 			
@@ -154,7 +150,7 @@ function getWeather(){
 		if(doc.length > 0){
 			console.log('Doc found: ',doc);
 			data = {
-				ownerid: globalOwnerId, 
+				ownerid: config.userId, 
 				timestamp: doc.timestamp
 				};
 			performRequest('/api/condweather', 'GET', data, 
@@ -172,7 +168,7 @@ function getWeather(){
 		else{//get first doc
 			console.log('no docs found');
 			data = {
-				ownerid: globalOwnerId,
+				ownerid: config.userId,
 				timestamp: new Date().getTime()
 				};
 			
@@ -198,7 +194,7 @@ function postSchedule(){
 	performRequest('/api/schedules', 'POST', testScheduleObject, function(res) {
 			console.log('response:', res);
 		});
-	console.log('GET Schedules Fired!');
+	console.log('Post Schedules Fired!');
 }
 
 
