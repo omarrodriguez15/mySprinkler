@@ -3,6 +3,8 @@
 var User = require('./user.model');
 var Schedule = require('../schedule/schedule.model');
 var defaultSchedule = require('../schedule/defaultSchedule');
+var Settings = require('../setting/setting.model');
+var defaultSettings = require('../setting/defaultSettings');
 var passport = require('passport');
 var config = require('../../config/environment');
 var jwt = require('jsonwebtoken');
@@ -40,6 +42,7 @@ exports.create = function (req, res, next) {
     var location;
     if  (error) return console.log(error);
     var newSchedule = new Schedule(defaultSchedule);
+    var newSetting = new Settings(defaultSettings);
     
     if( JSON.parse(body) !== {} && JSON.parse(body).results.length > 0) {
       location = JSON.parse(body).results[0].geometry.location;
@@ -54,17 +57,21 @@ exports.create = function (req, res, next) {
     }
    
     newSchedule.save(function(err, sched) {
-      
-      newUser.cord.lat = location.lat;
-      newUser.cord.lon = location.lng;
-      newUser.provider = 'local';
-      newUser.role = 'user';
-      newUser.schedId = sched._id;
-      
-      newUser.save(function(err, user) {
-        if (err) return validationError(res, err);
-        var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresIn: 3600*5 });
-        return res.json({ token: token });
+      newSetting.save(function(err, setting) {
+        
+        newUser.cord.lat = location.lat;
+        newUser.cord.lon = location.lng;
+        newUser.provider = 'local';
+        newUser.role = 'user';
+        newUser.schedId = sched._id;
+        newUser.settingId = setting._id;
+        
+        newUser.save(function(err, user) {
+          if (err) return validationError(res, err);
+          var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresIn: 3600*5 });
+          return res.json({ token: token });
+        });
+        
       });
     });
   });
