@@ -36,12 +36,12 @@ exports.create = function (req, res, next) {
   
   //convert address to lat and lon
   //this should only been done once this is for testing right now
-  geoCode.get({ qs: {address: newUser.adress + ', ' + newUser.city + ', ' + newUser.state , key: config.geoCoding.apiKey}}, function(error, response, body){
+  geoCode.get({ qs: {address: newUser.address + ', ' + newUser.city + ', ' + newUser.state , key: config.geoCoding.apiKey}}, function(error, response, body){
     var location;
     if  (error) return console.log(error);
     var newSchedule = new Schedule(defaultSchedule);
     
-    if(typeof body.results !== 'undefined' && body.results.count > 0) {
+    if( JSON.parse(body) !== {} && JSON.parse(body).results.length > 0) {
       location = JSON.parse(body).results[0].geometry.location;
     }
     else{
@@ -63,8 +63,8 @@ exports.create = function (req, res, next) {
       
       newUser.save(function(err, user) {
         if (err) return validationError(res, err);
-        var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresInMinutes: 60*5 });
-        res.json({ token: token });
+        var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresIn: 3600*5 });
+        return res.json({ token: token });
       });
     });
   });

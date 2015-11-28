@@ -18,6 +18,7 @@ function onConnect(socket) {
   });
 
   // Insert sockets below
+  require('../api/publicUser/publicUser.socket').register(socket);
   require('../api/setting/setting.socket').register(socket);
   require('../api/pi/pi.socket').register(socket);
   require('../api/condweather/condweather.socket').register(socket);
