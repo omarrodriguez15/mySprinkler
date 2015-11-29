@@ -22,9 +22,9 @@ app.use(function(req, res, next){
 	next();
 });
 
-app.use('/hello',function(req, res, next){
-	res.send('Hello mySprinkler');
-	services.beginTimer();
+app.use('/start',function(req, res, next){
+	res.send('Starting Important Sprinkler Stuff :D');
+	services.startUpService();
 	next();
 });
 

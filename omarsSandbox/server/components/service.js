@@ -9,44 +9,22 @@ var querystring = require('querystring');
 var host = 'localhost';
 
 module.exports = {
-	beginTimer : function(){
+	startUpService : function(){
 		console.log('entering begin timer');
-		//getUserProfile();
-		//setSprinklerTimer();
-		
-		//3600000 miliseconds is an hour
-		//in demo change to 5000 for more real time updating of status 
-		setInterval(function(){
-			getStatus();
-		}, 3600000);
-		
-		//3600000 miliseconds is an hour
-		setInterval(function(){
-			getSchedule();
-			//postIp();
-		}, 3600000);
-		
-		//3 hours = 10800000 milliseconds
-		setInterval(function(){
-			getWeather();
-		}, 10800000);
-		
-		//86400000 miliseconds in a day
-		//604800000 in 7 days	 
-		setInterval(function(){
-	 		getForecast();
-		}, 604800000);
+		//call startup functions only called once
+		onStartup();
 	}
 };
 
 function getUserProfile(){
+	console.log('getUserProfile()');
 	var Pi = mongoose.model('Pi', models.pi);
 	Pi.find({}, function(err, info){
 		if(err){ console.log('err: '+err);}
 		//only get user from server if there is no pi doc
 		if(info.length < 1){
-			console.log('getUserProfile');
 			
+			console.log("Don't have user profile yet so get it!");
 			performRequest('/api/publicUsers','GET',{piId : config.serialNumber},function(res){
 				console.log('Response: '+ JSON.stringify(res));
 				var newPi = new Pi(res);
@@ -58,7 +36,10 @@ function getUserProfile(){
 			});
 			
 		}
-		console.log('Already have user profile');
+		else{
+			console.log('Already have user profile, go on with life.');
+		}
+		
 	});
 }
 
@@ -378,25 +359,100 @@ function setSprinklerTimer(){
 	var Schedule = mongoose.model('Schedule', models.schedule);
 	
 	Schedule.find({}, function(err, schedule){
-		var start = schedule[0][currDay].start;
-		var end = schedule[0][currDay].end;
-		//var diff = currTime - start; 
-		//use setTimeout(callback,delay);
-		//miliHR = 3600000 miliseconds is an hour
-		
-		//currTime is before start
-		//12-13=1
-		//delay = diff * miliHR;
-		//setTimeout(turnSprinklerOn, delay);
-		////setTimeout(turnSprinklerOff, delay);
-		
-		//currTime is start
-		//13-13=0
-		
-		//currTime is after start
-		//14-13=-1
+		var start = schedule[0][currDay].start.slice(0,2);
+		var end = schedule[0][currDay].end.slice(0,2);
+		var startDiff = currDate.getHours() - start;
+		var seDiff = end - start;
 		
 		console.log('Start: '+start);
-		console.log('End: '+end);
+		console.log('end: '+end);
+		console.log('currDate.getHours(): '+currDate.getHours()); 
+		console.log('startDiff: '+startDiff);
+		console.log('seDiff: '+seDiff); 
+		
+		//use setTimeout(callback,delay);
+		var miliHr = 3600000; //miliseconds is an hour
+		
+		//currTime is before start
+		//12-13=-1
+		if (startDiff < 0){
+			//get delay in terms of milliseconds
+			var delayOn = (startDiff * -1) * miliHr;
+			console.log('delayOn: '+delayOn);
+			setTimeout(turnSprinklerOn, delayOn);
+			
+			var delayOff = (seDiff * miliHr) + delayOn;
+			console.log('delayOff: '+delayOff);
+			setTimeout(turnSprinklerOff, delayOff);
+			
+			console.log('delayOff - delayOn: '+(delayOff - delayOn));
+		}
+		//currTime is after start
+		//14-13=1
+		else if (startDiff > 0){
+			console.log('missed watering today??');
+		}
+		//currTime is start
+		//13-13=0
+		else if (startDiff === 0){
+			turnSprinklerOn();
+			var delayOff = (seDiff * miliHr);
+			console.log('delayOff: '+delayOff);
+			setTimeout(turnSprinklerOff, delayOff);
+		}
 	});
+}
+
+function onStartup(){
+	console.log('Starting Up!');
+	getUserProfile();
+	setSprinklerTimer();
+	
+	var currHour = new Date().getHours();
+	var diff = 23 - currHour;
+	var delayTimer = 0;
+	
+	if (diff > 0){
+		//calculates milliseconds until 2AM
+		delayTimer = (diff * 3600000) + 10800000;
+	}
+	else if (diff < 0){
+		console.log('something went wrong setting delayTimer');
+	}
+	
+	console.log('delayTimer: '+delayTimer);
+	//At 2AM it will set the new timers for that day and 
+	//have a continuous timer set for every day to do the 
+	//same at the same time
+	setTimeout(function(){
+		setSprinklerTimer();
+		//86400000 miliseconds in a day
+		setInterval(function(){
+			setSprinklerTimer();
+		}, 86400000);
+	}, delayTimer);
+	
+	
+	//3600000 miliseconds is an hour
+	//in demo change to 5000 for more real time updating of status 
+	setInterval(function(){
+		getStatus();
+	}, 3600000);
+	
+	//3600000 miliseconds is an hour
+	setInterval(function(){
+		getSchedule();
+		//postIp();
+	}, 3600000);
+	
+	//3 hours = 10800000 milliseconds
+	setInterval(function(){
+		getWeather();
+	}, 10800000);
+	
+	//86400000 miliseconds in a day
+	//604800000 in 7 days	 
+	setInterval(function(){
+		getForecast();
+	}, 604800000);
 }
