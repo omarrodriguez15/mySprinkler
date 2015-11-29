@@ -1,28 +1,27 @@
 'use strict';
 
 var config = require('../config/local.env');
+var _ = require('lodash');
 var mongoose = require('mongoose');
 var models = require('../models/index');
-//var weatherSchema = require('../models/Weather');
 var http = require('http');
 var querystring = require('querystring');
 var host = 'localhost';
-/*
-var scheduleSchema = require('../models/schedule');
-var schedule = mongoose.model('schedule', scheduleSchema);
-*/
 
 module.exports = {
 	beginTimer : function(){
 		console.log('entering begin timer');
-				
+		getUserProfile();
+		
 		//3600000 miliseconds is an hour
+		//in demo change to 5000 for more real time updating of status 
 		setInterval(function(){
 			getStatus();
 		}, 3600000);
+		
 		//3600000 miliseconds is an hour
 		setInterval(function(){
-			//getSchedule();
+			getSchedule();
 			//postIp();
 		}, 3600000);
 		
@@ -38,6 +37,29 @@ module.exports = {
 		}, 604800000);
 	}
 };
+
+function getUserProfile(){
+	var Pi = mongoose.model('Pi', models.pi);
+	Pi.find({}, function(err, info){
+		if(err){ console.log('err: '+err);}
+		//only get user from server if there is no pi doc
+		if(info.length < 1){
+			console.log('getUserProfile');
+			
+			performRequest('/api/publicUsers','GET',{piId : config.serialNumber},function(res){
+				console.log('Response: '+ JSON.stringify(res));
+				var newPi = new Pi(res);
+							
+				newPi.save(function(err){
+					if(err) console.log(err);
+					console.log('Saved new Pi info successfully');
+				});
+			});
+			
+		}
+		console.log('Already have user profile');
+	});
+}
 
 //Get schedule from webserver to check status
 function getStatus(){
@@ -64,40 +86,40 @@ function getStatus(){
 	
 }
 
-//TODO:Get user info No api endpoint yet
-function getUserProfile(){
-	var Pi = mongoose.model('Pi', models.pi);
-	Pi.find({}, function(err, info){
-		if(err){ console.log('err: '+err);}
-		//only get user from server if there is no pi doc
-		if(info.length < 1){
-			console.log('getUserProfile');
-			
-			performRequest('/api/publicUsers','GET',{piId : config.serialNumber},function(res){
-				console.log('Response: '+ JSON.stringify(res));
-				var newPi = new Pi(res);
-							
-				newPi.save(function(err){
-					if(err) console.log(err);
-					console.log('Saved new Pi info successfully');
-				});
-			});
-			
-		}
-		
-	});
-}
-
-//TODO:hardcoded id
 //Get schedule from webserver to update schedule if necessary
 function getSchedule(){
 	console.log('getSchedule');
-	performRequest('/api/schedules/'+config.schedulesId,'GET',{},function(res){
-		console.log('Response: '+res.sunday.status);
-		//check if different from current schedule
-		//if different write to db
+	var Pi = mongoose.model('Pi', models.pi);
+	Pi.find({}, function(err, info){
+		performRequest('/api/schedules/'+info[0].schedId,'GET',{},function(res){
+			//TODO:check if different from current schedule
+			//if different write to db
+			
+			//Just overwrite for now
+			var Schedule = mongoose.model('Schedule', models.pi);
+			
+			Schedule.findById(info[0].schedId, function (err, schedule) {
+				if (err) { return console.log('err: '+err); }
+				
+				if(!schedule) {
+					console.log('Schedule not found creating a new one');
+					
+					var newSchedule = new Schedule(res);
+					newSchedule.save(function(err){
+						if(err) {return console.log(err);}
+						return console.log('Created new schedule successfully');
+					});
+				 }
+				 else{
+					 Schedule.findOneAndUpdate({_id: info[0].schedId}, res, {overwrite: true}, function(){
+						 console.log('updated sched:');
+					 });
+				 }
+			});
+		});
 	});
 }
+
 //TODO:hardcoded id
 //Get schedule from webserver to check status
 function getForecast(){
