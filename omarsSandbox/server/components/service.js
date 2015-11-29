@@ -18,7 +18,7 @@ module.exports = {
 				
 		//3600000 miliseconds is an hour
 		setInterval(function(){
-			//getStatus();
+			getStatus();
 		}, 3600000);
 		//3600000 miliseconds is an hour
 		setInterval(function(){
@@ -39,22 +39,29 @@ module.exports = {
 	}
 };
 
-//TODO:ScheduleId hardcoded
 //Get schedule from webserver to check status
 function getStatus(){
 	console.log('getStatus');
-	performRequest('/api/schedules/'+config.schedulesId,'GET',{},function(res){
-		console.log('Response: '+res.sunday.status);
-		//TODO:
-		//if 1 fire py script
-		//path to script
-		var path = '/Users/jabba/Desktop/test.py';
-		var py = require('child_process').spawn('python', [path]);
-
-		py.stdout.on('data', function (data) {
-			console.log('stdout: ' + data);
+	
+	var Pi = mongoose.model('Pi', models.pi);
+	Pi.find({}, function(err, info){
+		performRequest('/api/schedules/'+info[0].schedId,'GET',{},function(res){
+			//get current day and time and check that status
+			console.log('Response: '+res.sunday.status);
+			//TODO:
+			//if 1 fire py script
+			if(res.sunday.status === '1'){
+				console.log('turn sprinkler on');
+				//path stored in config
+				var py = require('child_process').spawn('python', [config.path]);
+				
+				py.stdout.on('data', function (data) {
+					console.log('stdout: ' + data);
+				});
+			}
 		});
 	});
+	
 }
 
 //TODO:Get user info No api endpoint yet

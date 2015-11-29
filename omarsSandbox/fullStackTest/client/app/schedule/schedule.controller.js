@@ -59,6 +59,7 @@ angular.module('fullStackTestApp')
       $scope.register = function(txtPiId){
         console.log('passed value: '+txtPiId);
         $http.put('/api/publicUsers/'+user._id,{piId : txtPiId}).success(function(res){
+          console.log('res: '+res);
           console.log('success');
           $route.reload();
         });
