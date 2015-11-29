@@ -33,7 +33,7 @@ module.exports = {
 		//86400000 miliseconds in a day
 		//604800000 in 7 days	 
 		setInterval(function(){
-	 		//getForecast();
+	 		getForecast();
 		}, 604800000);
 	}
 };
@@ -123,46 +123,52 @@ function getSchedule(){
 //TODO:hardcoded id
 //Get schedule from webserver to check status
 function getForecast(){
-	 var Forecast = mongoose.model('forecasts', models.forecast);
-	//Get the last document saved
-	Forecast.find({}).sort({timestamp: -1}).exec(function(err,doc){
-		var data;
-		if(doc.length > 0){
-			console.log('Doc found: ',doc);
-			data = {
-				ownerid: config.userId, 
-				timestamp: doc.timestamp
-				};
-			performRequest('/api/forecasts', 'GET', data, 
-			function(res) {
-				console.log('response:', res,'response length: ',res.length);
-				if(res.length > 0){
+	console.log('getForecast');
+	var Forecast = mongoose.model('forecasts', models.forecast);
+	var Pi = mongoose.model('Pi', models.pi);
+	 
+	Pi.find({}, function(err, info){
+		//Get the last document saved
+		Forecast.find({}).sort({timestamp: -1}).exec(function(err,doc){
+			var data;
+			if(doc.length > 0){
+				console.log('Doc found: ',doc);
+				data = {
+					ownerid: info[0].ownerid, 
+					timestamp: doc.timestamp
+					};
+				performRequest('/api/forecasts', 'GET', data, 
+				function(res) {
+					console.log('response:', res,'response length: ',res.length);
+					if(res.length > 0){
+						var newForecast = new Forecast(res);
+						
+						newForecast.save(function(err){
+							if(err) console.log(err);
+						});
+					}
+				});
+			}
+			else{//get first doc
+				console.log('Forecast no docs found');
+				data = {
+					ownerid: info[0].ownerid,
+					timestamp: new Date().getTime()
+					};
+				
+				performRequest('/api/forecasts', 'GET', data, 
+				function(res) {
 					var newForecast = new Forecast(res);
 					
 					newForecast.save(function(err){
 						if(err) console.log(err);
 					});
-				}
-			});
-		}
-		else{//get first doc
-			console.log('Forecast no docs found');
-			data = {
-				ownerid: config.userId,
-				timestamp: new Date().getTime()
-				};
-			
-			performRequest('/api/forecasts', 'GET', data, 
-			function(res) {
-				var newForecast = new Forecast(res);
-				
-				newForecast.save(function(err){
-					if(err) console.log(err);
+					console.log('Forecast response:', res);
 				});
-				console.log('Forecast response:', res);
-			});
-		}
+			}
+		});
 	});
+	
 }
 
 //If first time need to create document which includes serial number of pi
