@@ -11,7 +11,8 @@ var host = 'localhost';
 module.exports = {
 	beginTimer : function(){
 		console.log('entering begin timer');
-		getUserProfile();
+		//getUserProfile();
+		//setSprinklerTimer();
 		
 		//3600000 miliseconds is an hour
 		//in demo change to 5000 for more real time updating of status 
@@ -73,13 +74,7 @@ function getStatus(){
 			//TODO:
 			//if 1 fire py script
 			if(res.sunday.status === '1'){
-				console.log('turn sprinkler on');
-				//path stored in config
-				var py = require('child_process').spawn('python', [config.path]);
-				
-				py.stdout.on('data', function (data) {
-					console.log('stdout: ' + data);
-				});
+				turnSprinklerOn();
 			}
 		});
 	});
@@ -347,3 +342,61 @@ var testScheduleObject = {
 			status: '0'
 		}
 	};
+
+//fire python script in config.path
+function turnSprinklerOn(){
+	console.log('turn sprinkler on');
+	//run python out of the same directory
+	var dir = process.cwd();
+	var py = require('child_process').spawn('python', [config.turnOn], {cwd: dir});
+	
+	py.stdout.on('data', function (data) {
+		console.log('stdout: ' + data);
+	});
+}
+
+//fire python script in config.path
+function turnSprinklerOff(){
+	console.log('turn sprinkler off');
+	
+	var dir = process.cwd();
+	//path stored in config
+	var py = require('child_process').spawn('python', [config.turnOff], {cwd: dir});
+	
+	py.stdout.on('data', function (data) {
+		console.log('stdout: ' + data);
+	});
+}
+
+//just for testing hopefully
+var days=['sunday','monday','tuesday','wednesday','thursday','friday', 'saturday']
+	
+function setSprinklerTimer(){
+	console.log('setSprinklerTimer');
+	var currDate = new Date();
+	var currDay = days[currDate.getDay()];
+	var Schedule = mongoose.model('Schedule', models.schedule);
+	
+	Schedule.find({}, function(err, schedule){
+		var start = schedule[0][currDay].start;
+		var end = schedule[0][currDay].end;
+		//var diff = currTime - start; 
+		//use setTimeout(callback,delay);
+		//miliHR = 3600000 miliseconds is an hour
+		
+		//currTime is before start
+		//12-13=1
+		//delay = diff * miliHR;
+		//setTimeout(turnSprinklerOn, delay);
+		////setTimeout(turnSprinklerOff, delay);
+		
+		//currTime is start
+		//13-13=0
+		
+		//currTime is after start
+		//14-13=-1
+		
+		console.log('Start: '+start);
+		console.log('End: '+end);
+	});
+}
