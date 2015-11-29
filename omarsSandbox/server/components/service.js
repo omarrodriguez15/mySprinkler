@@ -14,25 +14,27 @@ var schedule = mongoose.model('schedule', scheduleSchema);
 
 module.exports = {
 	beginTimer : function(){
+		console.log('entering begin timer');
+				
 		//3600000 miliseconds is an hour
 		setInterval(function(){
-			getStatus();
+			//getStatus();
 		}, 3600000);
 		//3600000 miliseconds is an hour
 		setInterval(function(){
-			getSchedule();
+			//getSchedule();
 			//postIp();
 		}, 3600000);
 		
 		//3 hours = 10800000 milliseconds
 		setInterval(function(){
-			getWeather();
+			//getWeather();
 		}, 10800000);
 		
 		//86400000 miliseconds in a day
 		//604800000 in 7 days	 
 		setInterval(function(){
-	 		getForecast();
+	 		//getForecast();
 		}, 604800000);
 	}
 };
@@ -58,12 +60,24 @@ function getStatus(){
 //TODO:Get user info No api endpoint yet
 function getUserProfile(){
 	var Pi = mongoose.model('Pi', models.pi);
-	var pi_info = Pi.find({});
-	
-	console.log('getUserProfile');
-	
-	performRequest('/api/publicUser/'+pi_info.userId,'GET',{},function(res){
-		console.log('Response: '+ res);
+	Pi.find({}, function(err, info){
+		if(err){ console.log('err: '+err);}
+		//only get user from server if there is no pi doc
+		if(info.length < 1){
+			console.log('getUserProfile');
+			
+			performRequest('/api/publicUsers','GET',{piId : config.serialNumber},function(res){
+				console.log('Response: '+ JSON.stringify(res));
+				var newPi = new Pi(res);
+							
+				newPi.save(function(err){
+					if(err) console.log(err);
+					console.log('Saved new Pi info successfully');
+				});
+			});
+			
+		}
+		
 	});
 }
 

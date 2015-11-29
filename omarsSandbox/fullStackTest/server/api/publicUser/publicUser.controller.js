@@ -6,10 +6,21 @@ var User = require('../user/user.model');
 
 // Get list of publicUsers
 exports.index = function(req, res) {
-  PublicUser.find(function (err, publicUsers) {
-    if(err) { return handleError(res, err); }
-    return res.status(200).json(publicUsers);
-  });
+  if (Object.keys(req.query).length === 0){
+    PublicUser.find(function (err, publicUsers) {
+      if(err) { return handleError(res, err); }
+      return res.status(200).json(publicUsers);
+    });
+  }
+  else if (typeof req.query.piId !== 'undefined' ){
+    //get the docs that are older than the timestamp passed in
+    User.find({piId :req.query.piId}, function (err, user) {
+      if(err) { return handleError(res, err); }
+      stripUser(user, function(usr){
+        return res.status(200).json(usr);
+      });
+    });
+  }
 };
 
 // Get a single publicUser
@@ -56,6 +67,25 @@ exports.destroy = function(req, res) {
     });
   });
 };
+
+function stripUser(usr, cb){
+  //really ugly hack sorry...
+  var x = JSON.stringify(usr);
+  var c = JSON.parse(x);
+  usr = c[0];
+  
+  var strippedUsr = {
+    name: usr.name,
+    ownerid: usr._id,
+    serialnumber: usr.piId,
+    email: usr.email,
+    schedId: usr.schedId,
+    settingId: usr.settingId,
+    cord: usr.cord,
+    role: usr.role 
+  };
+  return cb(strippedUsr);
+}
 
 function handleError(res, err) {
   return res.status(500).send(err);
