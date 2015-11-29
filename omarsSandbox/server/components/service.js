@@ -27,7 +27,7 @@ module.exports = {
 		
 		//3 hours = 10800000 milliseconds
 		setInterval(function(){
-			//getWeather();
+			getWeather();
 		}, 10800000);
 		
 		//86400000 miliseconds in a day
@@ -186,49 +186,51 @@ function postIp(){
 //get condensed weather info from webserver
 //save to local db
 function getWeather(){
+	console.log('Get Weather Fired!');
+	var Pi = mongoose.model('Pi', models.pi);
 	var Weather = mongoose.model('weathers', models.weather);
-	//Get the last document saved
-	Weather.find({}).sort({timestamp: -1}).exec(function(err,doc){
-		var data;
-		if(doc.length > 0){
-			console.log('Doc found: ',doc);
-			data = {
-				ownerid: config.userId, 
-				timestamp: doc.timestamp
-				};
-			performRequest('/api/condweather', 'GET', data, 
-			function(res) {
-				console.log('response:', res,'response length: ',res.length);
-				if(res.length > 0){
+	
+	Pi.find({}, function(err, info){
+		//Get the last document saved
+		Weather.find({}).sort({timestamp: -1}).exec(function(err,doc){
+			var data;
+			if(doc.length > 0){
+				console.log('Doc found: ',doc);
+				data = {
+					ownerid: info[0].ownerid, 
+					timestamp: doc.timestamp
+					};
+				performRequest('/api/condweather', 'GET', data, 
+				function(res) {
+					console.log('response:', res,'response length: ',res.length);
+					if(res.length > 0){
+						var newWeather = new Weather(res);
+						
+						newWeather.save(function(err){
+							if(err) console.log(err);
+						});
+					}
+				});
+			}
+			else{//get first doc
+				console.log('no docs found');
+				data = {
+					ownerid: info[0].ownerid,
+					timestamp: new Date().getTime()
+					};
+				
+				performRequest('/api/condweather', 'GET', data, 
+				function(res) {
 					var newWeather = new Weather(res);
 					
 					newWeather.save(function(err){
 						if(err) console.log(err);
 					});
-				}
-			});
-		}
-		else{//get first doc
-			console.log('no docs found');
-			data = {
-				ownerid: config.userId,
-				timestamp: new Date().getTime()
-				};
-			
-			performRequest('/api/condweather', 'GET', data, 
-			function(res) {
-				var newWeather = new Weather(res);
-				
-				newWeather.save(function(err){
-					if(err) console.log(err);
+					console.log('response:', res);
 				});
-				console.log('response:', res);
-			});
-		}
+			}
+		});
 	});
-	
-	
-	console.log('Get Weather Fired!');
 }
 
 //For testing its sending a get request not post
