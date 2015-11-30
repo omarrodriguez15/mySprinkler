@@ -74,6 +74,7 @@ angular.module('fullStackTestApp')
         
         createScheduleArray(res, function(newWeek){
           $scope.times = times;
+          console.log('neweek: '+JSON.stringify(newWeek));
           $scope.week = newWeek;
         });
         
