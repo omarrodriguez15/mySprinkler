@@ -19,8 +19,8 @@ angular.module('fullStackTestApp')
     
     $http.get('/api/condweather/latest').success(function(condWeather) {
       console.log('res: '+ JSON.stringify(condWeather));
-      $scope.temp = condWeather.temp;
-      $scope.icon = condWeather.icon;
+      //$scope.temp = condWeather.temp;
+      //$scope.icon = condWeather.icon;
     });
 
 
