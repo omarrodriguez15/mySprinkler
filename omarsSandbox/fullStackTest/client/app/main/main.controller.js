@@ -9,12 +9,20 @@ angular.module('fullStackTestApp')
     }
 
     var user = Auth.getCurrentUser();
+    $scope.city = user.city;
     console.log(user);
 
     $http.get('/api/things').success(function(awesomeThings) {
       $scope.awesomeThings = awesomeThings;
       socket.syncUpdates('thing', $scope.awesomeThings);
     });
+    
+    $http.get('/api/condweather/latest').success(function(condWeather) {
+      console.log('res: '+ JSON.stringify(condWeather));
+      $scope.temp = condWeather.temp;
+      $scope.icon = condWeather.icon;
+    });
+
 
 
     //replace with http get current status of sprinkler

@@ -6,6 +6,7 @@ var controller = require('./condweather.controller');
 var router = express.Router();
 
 router.get('/', controller.index);
+router.get('/latest', controller.latest);
 router.get('/:id', controller.show);
 router.post('/', controller.create);
 router.put('/:id', controller.update);

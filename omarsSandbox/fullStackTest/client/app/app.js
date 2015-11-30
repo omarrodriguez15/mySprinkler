@@ -11,7 +11,7 @@ angular.module('fullStackTestApp', [
   .config(function ($routeProvider, $locationProvider, $httpProvider) {
     $routeProvider
       .otherwise({
-        redirectTo: '/login'
+        redirectTo: '/'
       });
 
     $locationProvider.html5Mode(true);

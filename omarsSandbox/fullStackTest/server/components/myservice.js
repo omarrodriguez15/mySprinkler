@@ -38,6 +38,7 @@ function createCondDoc(weatherRes){
 	_newCondWeather.latitude = weatherRes.coord.lat;
 	_newCondWeather.temp_min = weatherRes.main.temp_min;
 	_newCondWeather.temp_max = weatherRes.main.temp_max;
+	_newCondWeather.icon = weatherRes.weather.icon;
 	_newCondWeather.elevation = '112';//367ft or 112 m
 	//rain property only exist if it rained in pass 3 hours
 	_newCondWeather.rain = typeof weatherRes.rain === 'undefined'? '0': _newCondWeather.rain = weatherRes.rain['3h'];
@@ -74,7 +75,7 @@ function updateUsersWeather(user, callback){
 	});
 
 	//append the qs(query string of latitude and longitude)
-	weather.get({ qs: { lat: user.cord.lat, lon: user.cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
+	weather.get({ qs: { lat: user.cord.lat, lon: user.cord.lon, APPID: config.openWeather.apiKey, units: 'imperial'} }, function (error, weatherResponse, body) {
 		if (error) return console.log(error);
 		
 		body.timestamp = new Date().getTime();
@@ -103,7 +104,7 @@ function updateUserForecast(user){
 		});
 		
 		//append the qs(query string of latitude and longitude)
-		weather.get({ qs: { lat: user.cord.lat, lon: user.cord.lon, APPID: config.openWeather.apiKey} }, function (error, weatherResponse, body) {
+		weather.get({ qs: { lat: user.cord.lat, lon: user.cord.lon, APPID: config.openWeather.apiKey, units: 'imperial'} }, function (error, weatherResponse, body) {
 			if (error) return console.log(error);
 			
 			body.timestamp = new Date().getTime();

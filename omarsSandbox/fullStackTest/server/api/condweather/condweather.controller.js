@@ -30,6 +30,15 @@ exports.show = function(req, res) {
   });
 };
 
+// Get a latest condweather
+exports.latest = function(req, res) {
+  Condweather.findOne({}, function (err, condweather) {
+    if(err) { return handleError(res, err); }
+    if(!condweather) { return res.status(404).send('Not Found'); }
+    return res.json(condweather);
+  });
+};
+
 // Creates a new condweather in the DB.
 exports.create = function(req, res) {
   Condweather.create(req.body, function(err, condweather) {
