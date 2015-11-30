@@ -9,7 +9,6 @@ angular.module('fullStackTestApp')
     var user = Auth.getCurrentUser();
     console.log(user);
     
-    /*
     jQuery('#numberofzones').slider({
       formatter: function(value) {
         return (value);
@@ -21,13 +20,13 @@ angular.module('fullStackTestApp')
         return (value + ' in');
       }
     });
-    */
-
+    
     $http.get('/api/settings/'+user.settingId).success(function(res) {
       if (res.length < 1) {
         return console.log('no settings found!');
       }
 
+      console.log(res);
       updateSettings(res);
     });
 

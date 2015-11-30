@@ -1,9 +1,9 @@
 module.exports = {
-  wateringtype : '0',
-	numberofzones : '0',
-	wateringthreshold : '0',
-	soiltype : '0',
-	planttype : '0',
-	shadedarea : '0',
-	slopedarea : '0' 
+  wateringtype : 'Recommended',
+	numberofzones : '1',
+	wateringthreshold : '2.00',
+	soiltype : 'Loam',
+	planttype : 'Grass',
+	shadedarea : false,
+	slopedarea : false 
 };

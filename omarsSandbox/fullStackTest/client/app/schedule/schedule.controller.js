@@ -31,7 +31,7 @@ var times = ['00:00','01:00','02:00','03:00','04:00','05:00','06:00','07:00','08
 function createScheduleArray(sched, cb){
   var newWeek = week;
   for(var i = 0; i < week.length ; i++){
-    var day = week[0].day.toString().toLowerCase();
+    var day = week[i].day.toString().toLowerCase();
     
     newWeek[i].start = sched[day].start;
     newWeek[i].end = sched[day].end;
