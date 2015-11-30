@@ -20,7 +20,7 @@ Then I updated bower cleaned cache and reinstalled bower dependencies
 
     bower cache clean
     sudo npm install -g bower
-    bower install
+    sudo bower install --allow-root
 
 
 #ARCH Linux Pi

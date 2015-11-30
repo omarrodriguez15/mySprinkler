@@ -6,7 +6,7 @@ var mongoose = require('mongoose');
 var models = require('../models/index');
 var http = require('http');
 var querystring = require('querystring');
-var host = 'localhost';
+var host = config.options.hostname;
 
 module.exports = {
 	startUpService : function(){
@@ -16,7 +16,7 @@ module.exports = {
 	}
 };
 
-function getUserProfile(){
+function getUserProfile(cb){
 	console.log('getUserProfile()');
 	var Pi = mongoose.model('Pi', models.pi);
 	Pi.find({}, function(err, info){
@@ -41,6 +41,7 @@ function getUserProfile(){
 		}
 		
 	});
+	cb();
 }
 
 //Get schedule from webserver to check status
@@ -49,17 +50,18 @@ function getStatus(){
 	
 	var Pi = mongoose.model('Pi', models.pi);
 	Pi.find({}, function(err, info){
-		performRequest('/api/schedules/'+info[0].schedId,'GET',{},function(res){
-			//get current day and time and check that status
-			console.log('Response: '+res.sunday.status);
-			//TODO:
-			//if 1 fire py script
-			if(res.sunday.status === '1'){
-				turnSprinklerOn();
-			}
-		});
+		if(info.length > 0){
+			performRequest('/api/schedules/'+info[0].schedId,'GET',{},function(res){
+				//get current day and time and check that status
+				console.log('Response: '+res.sunday.status);
+				//TODO:
+				//if 1 fire py script
+				if(res.sunday.status === '1'){
+					turnSprinklerOn();
+				}
+			});
+		}
 	});
-	
 }
 
 //Get schedule from webserver to update schedule if necessary
@@ -67,32 +69,34 @@ function getSchedule(){
 	console.log('getSchedule');
 	var Pi = mongoose.model('Pi', models.pi);
 	Pi.find({}, function(err, info){
-		performRequest('/api/schedules/'+info[0].schedId,'GET',{},function(res){
-			//TODO:check if different from current schedule
-			//if different write to db
-			
-			//Just overwrite for now
-			var Schedule = mongoose.model('Schedule', models.pi);
-			
-			Schedule.findById(info[0].schedId, function (err, schedule) {
-				if (err) { return console.log('err: '+err); }
+		if(info.length > 0){
+			performRequest('/api/schedules/'+info[0].schedId,'GET',{},function(res){
+				//TODO:check if different from current schedule
+				//if different write to db
 				
-				if(!schedule) {
-					console.log('Schedule not found creating a new one');
+				//Just overwrite for now
+				var Schedule = mongoose.model('Schedule', models.pi);
+				
+				Schedule.findById(info[0].schedId, function (err, schedule) {
+					if (err) { return console.log('err: '+err); }
 					
-					var newSchedule = new Schedule(res);
-					newSchedule.save(function(err){
-						if(err) {return console.log(err);}
-						return console.log('Created new schedule successfully');
-					});
-				 }
-				 else{
-					 Schedule.findOneAndUpdate({_id: info[0].schedId}, res, {overwrite: true}, function(){
-						 console.log('updated sched:');
-					 });
-				 }
+					if(!schedule) {
+						console.log('Schedule not found creating a new one');
+						
+						var newSchedule = new Schedule(res);
+						newSchedule.save(function(err){
+							if(err) {return console.log(err);}
+							return console.log('Created new schedule successfully');
+						});
+					}
+					else{
+						Schedule.findOneAndUpdate({_id: info[0].schedId}, res, {overwrite: true}, function(){
+							console.log('updated sched:');
+						});
+					}
+				});
 			});
-		});
+		}
 	});
 }
 
@@ -107,7 +111,7 @@ function getForecast(){
 		//Get the last document saved
 		Forecast.find({}).sort({timestamp: -1}).exec(function(err,doc){
 			var data;
-			if(doc.length > 0){
+			if(doc.length > 0 && info.length > 0){
 				console.log('Doc found: ',doc);
 				data = {
 					ownerid: info[0].ownerid, 
@@ -176,7 +180,7 @@ function getWeather(){
 		//Get the last document saved
 		Weather.find({}).sort({timestamp: -1}).exec(function(err,doc){
 			var data;
-			if(doc.length > 0){
+			if(doc.length > 0 && info.length > 0){
 				console.log('Doc found: ',doc);
 				data = {
 					ownerid: info[0].ownerid, 
@@ -359,100 +363,105 @@ function setSprinklerTimer(){
 	var Schedule = mongoose.model('Schedule', models.schedule);
 	
 	Schedule.find({}, function(err, schedule){
-		var start = schedule[0][currDay].start.slice(0,2);
-		var end = schedule[0][currDay].end.slice(0,2);
-		var startDiff = currDate.getHours() - start;
-		var seDiff = end - start;
-		
-		console.log('Start: '+start);
-		console.log('end: '+end);
-		console.log('currDate.getHours(): '+currDate.getHours()); 
-		console.log('startDiff: '+startDiff);
-		console.log('seDiff: '+seDiff); 
-		
-		//use setTimeout(callback,delay);
-		var miliHr = 3600000; //miliseconds is an hour
-		
-		//currTime is before start
-		//12-13=-1
-		if (startDiff < 0){
-			//get delay in terms of milliseconds
-			var delayOn = (startDiff * -1) * miliHr;
-			console.log('delayOn: '+delayOn);
-			setTimeout(turnSprinklerOn, delayOn);
+		if(schedule.length > 0){
+			var start = schedule[0][currDay].start.slice(0,2);
+			var end = schedule[0][currDay].end.slice(0,2);
+			var startDiff = currDate.getHours() - start;
+			var seDiff = end - start;
 			
-			var delayOff = (seDiff * miliHr) + delayOn;
-			console.log('delayOff: '+delayOff);
-			setTimeout(turnSprinklerOff, delayOff);
+			console.log('Start: '+start);
+			console.log('end: '+end);
+			console.log('currDate.getHours(): '+currDate.getHours()); 
+			console.log('startDiff: '+startDiff);
+			console.log('seDiff: '+seDiff); 
 			
-			console.log('delayOff - delayOn: '+(delayOff - delayOn));
+			//use setTimeout(callback,delay);
+			var miliHr = 3600000; //miliseconds is an hour
+			
+			//currTime is before start
+			//12-13=-1
+			if (startDiff < 0){
+				//get delay in terms of milliseconds
+				var delayOn = (startDiff * -1) * miliHr;
+				console.log('delayOn: '+delayOn);
+				setTimeout(turnSprinklerOn, delayOn);
+				
+				var delayOff = (seDiff * miliHr) + delayOn;
+				console.log('delayOff: '+delayOff);
+				setTimeout(turnSprinklerOff, delayOff);
+				
+				console.log('delayOff - delayOn: '+(delayOff - delayOn));
+			}
+			//currTime is after start
+			//14-13=1
+			else if (startDiff > 0){
+				console.log('missed watering today??');
+			}
+			//currTime is start
+			//13-13=0
+			else if (startDiff === 0){
+				turnSprinklerOn();
+				var delayOff = (seDiff * miliHr);
+				console.log('delayOff: '+delayOff);
+				setTimeout(turnSprinklerOff, delayOff);
+			}
 		}
-		//currTime is after start
-		//14-13=1
-		else if (startDiff > 0){
-			console.log('missed watering today??');
-		}
-		//currTime is start
-		//13-13=0
-		else if (startDiff === 0){
-			turnSprinklerOn();
-			var delayOff = (seDiff * miliHr);
-			console.log('delayOff: '+delayOff);
-			setTimeout(turnSprinklerOff, delayOff);
+		else{
+			getSchedule();
 		}
 	});
 }
 
 function onStartup(){
 	console.log('Starting Up!');
-	getUserProfile();
-	setSprinklerTimer();
-	
-	var currHour = new Date().getHours();
-	var diff = 23 - currHour;
-	var delayTimer = 0;
-	
-	if (diff > 0){
-		//calculates milliseconds until 2AM
-		delayTimer = (diff * 3600000) + 10800000;
-	}
-	else if (diff < 0){
-		console.log('something went wrong setting delayTimer');
-	}
-	
-	console.log('delayTimer: '+delayTimer);
-	//At 2AM it will set the new timers for that day and 
-	//have a continuous timer set for every day to do the 
-	//same at the same time
-	setTimeout(function(){
+	getUserProfile(function(){
 		setSprinklerTimer();
-		//86400000 miliseconds in a day
-		setInterval(function(){
+		var currHour = new Date().getHours();
+		var diff = 23 - currHour;
+		var delayTimer = 0;
+		
+		if (diff > 0){
+			//calculates milliseconds until 2AM
+			delayTimer = (diff * 3600000) + 10800000;
+		}
+		else if (diff < 0){
+			console.log('something went wrong setting delayTimer');
+		}
+		
+		console.log('delayTimer: '+delayTimer);
+		//At 2AM it will set the new timers for that day and 
+		//have a continuous timer set for every day to do the 
+		//same at the same time
+		setTimeout(function(){
 			setSprinklerTimer();
-		}, 86400000);
-	}, delayTimer);
-	
-	
-	//3600000 miliseconds is an hour
-	//in demo change to 5000 for more real time updating of status 
-	setInterval(function(){
-		getStatus();
-	}, 3600000);
-	
-	//3600000 miliseconds is an hour
-	setInterval(function(){
-		getSchedule();
-		//postIp();
-	}, 3600000);
-	
-	//3 hours = 10800000 milliseconds
-	setInterval(function(){
-		getWeather();
-	}, 10800000);
-	
-	//86400000 miliseconds in a day
-	//604800000 in 7 days	 
-	setInterval(function(){
-		getForecast();
-	}, 604800000);
+			//86400000 miliseconds in a day
+			setInterval(function(){
+				setSprinklerTimer();
+			}, 86400000);
+		}, delayTimer);
+		
+		
+		//3600000 miliseconds is an hour
+		//in demo change to 5000 for more real time updating of status 
+		setInterval(function(){
+			getStatus();
+		}, 5000);
+		
+		//3600000 miliseconds is an hour
+		setInterval(function(){
+			getSchedule();
+			//postIp();
+		}, 3600000);
+		
+		//3 hours = 10800000 milliseconds
+		setInterval(function(){
+			getWeather();
+		}, 10800000);
+		
+		//86400000 miliseconds in a day
+		//604800000 in 7 days	 
+		setInterval(function(){
+			getForecast();
+		}, 604800000);
+	});
 }
