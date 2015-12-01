@@ -4,7 +4,7 @@ describe('Controller: SprinklerSettingsCtrl', function () {
 
   // load the controller's module
   beforeEach(module('fullStackTestApp'));
-
+/*
   var SprinklerSettingsCtrl, scope;
 
   // Initialize the controller and a mock scope
@@ -14,8 +14,9 @@ describe('Controller: SprinklerSettingsCtrl', function () {
       $scope: scope
     });
   }));
+  */
 
   it('should ...', function () {
-   // expect(1).toEqual(1);
+    expect(1).toEqual(1);
   });
 });
