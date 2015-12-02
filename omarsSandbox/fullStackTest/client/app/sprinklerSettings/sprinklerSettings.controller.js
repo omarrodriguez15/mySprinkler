@@ -36,7 +36,7 @@ angular.module('fullStackTestApp')
         if(jQuery('#wateringtype').val() === 'Recommended') {
           jQuery('#wateringthreshold').slider('setValue', 2.0);
         } else if(jQuery('#wateringtype').val() === 'Economical') {
-          jQuery('#wateringthreshold').slider('setValue', 1.5)
+          jQuery('#wateringthreshold').slider('setValue', 1.5);
         }
 
         console.log(jQuery('#wateringthreshold').val());

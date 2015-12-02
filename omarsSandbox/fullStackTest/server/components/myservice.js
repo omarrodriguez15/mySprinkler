@@ -9,9 +9,11 @@ var config = require('../config/environment');
 var currentWeather = 'http://api.openweathermap.org/data/2.5/weather';
 var forecast = 'http://api.openweathermap.org/data/2.5/forecast';
 
+var request = require('request');
+
 //Open Weather API
 //Doc: http://openweathermap.org/current#geo
-var weather = require('request').defaults({
+var weather = request.defaults({
   url: 'http://api.openweathermap.org/data/2.5/weather',
   json: true
 });

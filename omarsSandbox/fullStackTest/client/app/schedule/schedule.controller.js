@@ -121,16 +121,15 @@ angular.module('fullStackTestApp')
       };
 
       for(var day in week) {
-        console.log(week[day]);
         newschedule[week[day].day.toLowerCase()].start = week[day].start;
         newschedule[week[day].day.toLowerCase()].end = week[day].end;
         //newschedule[week[day].day.toLowerCase()]['status'] = week[day].status;
         newschedule[week[day].day.toLowerCase()].status = '0';
       }    
 
-      console.log(newschedule);
       $http.put('/api/schedules/' + user.schedId, newschedule)
         .success(function() {
+
           console.log('Schedule saved successfully.');
         });
     };
