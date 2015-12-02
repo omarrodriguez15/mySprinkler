@@ -9,5 +9,5 @@
 	//install stuff
 	pacman -S nodejs npm
 	pacman -S git
-	
+	pacman -S python
 	
