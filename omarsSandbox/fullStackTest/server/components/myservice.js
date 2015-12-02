@@ -125,13 +125,27 @@ module.exports = {
 	//1 hour is 3600000 milliseconds
 	//3h 10800000
 	makeEvents: function(){
-		 setInterval(function(){
-			 getCurrentWeather(createCondDoc);
-			 }, 10800000);
-		 //86400000 miliseconds in a day
-		 //604800000 in 7 days	 
-		 setInterval(function(){
-		 	 getForecast();
-		 }, 604800000);
+		Forecast.find({}, function(err, forecast){
+			if (forecast.length < 1){
+				console.log('forecast.length: '+forecast.length);
+				getForecast();
+			}
+			Weather.find({}, function(err, weather){
+				if (weather.length < 1){
+					console.log('weather.length: '+weather.length);
+					getCurrentWeather();
+				}
+				setInterval(function(){
+					getCurrentWeather(createCondDoc);
+				}, 10800000);
+				//86400000 miliseconds in a day
+				//604800000 in 7 days	 
+				setInterval(function(){
+					getForecast();
+				}, 604800000);
+			});
+		});
+		
+		 
 	}
 }
