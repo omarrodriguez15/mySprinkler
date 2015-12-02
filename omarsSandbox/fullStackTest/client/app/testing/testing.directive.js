@@ -13,7 +13,8 @@ angular.module('fullStackTestApp')
 
 				element.bootstrapToggle(zone.status.toLowerCase());
 				element.on('change', function() {
-					if(scope.status === 'OFF') {
+					zone = JSON.parse(attrs.mainToggle);
+					if(zone.status === 'OFF') {
 						today = {sunday:{start: '15:00', end:'16:00',status:'1'}};
       
 						$http.put('/api/schedules/'+user.schedId, today).success(function(res) {
@@ -25,7 +26,7 @@ angular.module('fullStackTestApp')
 							console.log(res);
 						});
 
-						scope.status = 'ON';
+						scope.zones[Number(zone.number) - 1].status = 'ON';
 					} else {
 						today = {sunday:{start: '15:00', end:'16:00',status:'0'}};
 						$http.put('/api/schedules/'+user.schedId, today).success(function(res) {
@@ -37,7 +38,7 @@ angular.module('fullStackTestApp')
 							console.log(res);
 						});
 
-						scope.status = 'OFF';
+						scope.zones[Number(zone.number) - 1].status = 'OFF';
 					}
 
 					scope.$apply();
