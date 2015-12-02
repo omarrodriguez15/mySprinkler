@@ -8,6 +8,11 @@ var http = require('http');
 var querystring = require('querystring');
 var host = config.options.hostname;
 
+var Pi = mongoose.model('Pi', models.pi);
+var Forecast = mongoose.model('forecasts', models.forecast);
+var Weather = mongoose.model('weathers', models.weather);
+var Schedule = mongoose.model('Schedule', models.schedule);
+
 module.exports = {
 	startUpService : function(){
 		console.log('entering begin timer');
@@ -18,7 +23,7 @@ module.exports = {
 
 function getUserProfile(cb){
 	console.log('getUserProfile()');
-	var Pi = mongoose.model('Pi', models.pi);
+
 	Pi.find({}, function(err, info){
 		if(err){ console.log('err: '+err);}
 		//only get user from server if there is no pi doc
@@ -26,6 +31,7 @@ function getUserProfile(cb){
 			
 			console.log("Don't have user profile yet so get it!");
 			performRequest('/api/publicUsers','GET',{piId : config.serialNumber},function(res){
+				
 				console.log('Response: '+ JSON.stringify(res));
 				var newPi = new Pi(res);
 							
@@ -48,7 +54,6 @@ function getUserProfile(cb){
 function getStatus(){
 	console.log('getStatus');
 	
-	var Pi = mongoose.model('Pi', models.pi);
 	Pi.find({}, function(err, info){
 		if(info.length > 0){
 			performRequest('/api/schedules/'+info[0].schedId,'GET',{},function(res){
@@ -67,7 +72,6 @@ function getStatus(){
 //Get schedule from webserver to update schedule if necessary
 function getSchedule(){
 	console.log('getSchedule');
-	var Pi = mongoose.model('Pi', models.pi);
 	Pi.find({}, function(err, info){
 		if(info.length > 0){
 			performRequest('/api/schedules/'+info[0].schedId,'GET',{},function(res){
@@ -75,7 +79,6 @@ function getSchedule(){
 				//if different write to db
 				
 				//Just overwrite for now
-				var Schedule = mongoose.model('Schedule', models.pi);
 				
 				Schedule.findById(info[0].schedId, function (err, schedule) {
 					if (err) { return console.log('err: '+err); }
@@ -104,8 +107,6 @@ function getSchedule(){
 //Get schedule from webserver to check status
 function getForecast(){
 	console.log('getForecast');
-	var Forecast = mongoose.model('forecasts', models.forecast);
-	var Pi = mongoose.model('Pi', models.pi);
 	 
 	Pi.find({}, function(err, info){
 		//Get the last document saved
@@ -173,8 +174,6 @@ function postIp(){
 //save to local db
 function getWeather(){
 	console.log('Get Weather Fired!');
-	var Pi = mongoose.model('Pi', models.pi);
-	var Weather = mongoose.model('weathers', models.weather);
 	
 	Pi.find({}, function(err, info){
 		//Get the last document saved
@@ -262,6 +261,12 @@ function performRequest(endpoint, method, data, success) {
       success(responseObject);
     });
   });
+  
+  req.on('error', function(error) {
+		// Error handling here
+		console.log("Received error: " + error);
+   });
+  
   //write the request to the body if needed
   req.write(dataString);
   req.end();
@@ -360,7 +365,6 @@ function setSprinklerTimer(){
 	console.log('setSprinklerTimer');
 	var currDate = new Date();
 	var currDay = days[currDate.getDay()];
-	var Schedule = mongoose.model('Schedule', models.schedule);
 	
 	Schedule.find({}, function(err, schedule){
 		if(schedule.length > 0){

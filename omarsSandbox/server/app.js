@@ -23,8 +23,7 @@ app.use(function(req, res, next){
 });
 
 app.use('/start',function(req, res, next){
-	res.send('Starting Important Sprinkler Stuff :D');
-	services.startUpService();
+	res.send('Nothing to see here :D');
 	next();
 });
 
@@ -45,6 +44,7 @@ var db = mongoose.connection.once('open',function(){
 		app.use(route, controller(app, route));
 	});
 	
+	services.startUpService();
 	console.log('listening on port 3000...');
 	app.listen(3000);
 });
