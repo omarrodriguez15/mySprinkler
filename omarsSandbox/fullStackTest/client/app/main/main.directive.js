@@ -1,25 +1,6 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-	.directive('mainToggle', function() {
-		return {
-			restrict: 'A',
-			link: function (scope, element) {
-				element.bootstrapToggle(scope.status.toLowerCase());
-				element.on('change', function() {
-					if(scope.status === 'OFF') {
-						scope.status = 'ON';
-					} else {
-						scope.status = 'OFF';
-					}
-
-					scope.$apply();
-				});
-			}
-		};
-	});
-
-angular.module('fullStackTestApp')
 	.directive('weather', function() {
 		return {
 			restrict: 'E',

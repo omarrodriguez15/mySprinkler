@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-  .controller('SprinklerSettingsCtrl', function ($scope, $cookieStore, Auth, Modal, $http, $location) {
+  .controller('SprinklerSettingsCtrl', function ($scope, Auth, Modal, $http, $location) {
     if(!Auth.isLoggedIn()) {
       $location.path('/login');
     }
@@ -32,8 +32,15 @@ angular.module('fullStackTestApp')
 
     $scope.submit = function(form) {
       $scope.submitted = true;
-      console.log(jQuery('wateringtype').val());
       if(form.$valid) {
+        if(jQuery('#wateringtype').val() === 'Recommended') {
+          jQuery('#wateringthreshold').slider('setValue', 2.0);
+        } else if(jQuery('#wateringtype').val() === 'Economical') {
+          jQuery('#wateringthreshold').slider('setValue', 1.5)
+        }
+
+        console.log(jQuery('#wateringthreshold').val());
+
         $http.put('/api/settings/'+user.settingId, {
             wateringtype : jQuery('#wateringtype').val(),
             numberofzones : jQuery('#numberofzones').val(),
@@ -58,5 +65,12 @@ angular.module('fullStackTestApp')
         jQuery('#planttype').val(settings.planttype);
         jQuery('#shadedarea').prop('checked', settings.shadedarea);
         jQuery('#slopedarea').prop('checked', settings.slopedarea);
+
+        if(settings.wateringtype === 'Custom') { 
+          $scope.customThreshold = true;
+        } else {
+          $scope.customThreshold = false;
+        } 
     }
   });
+

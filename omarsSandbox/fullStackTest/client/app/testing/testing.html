@@ -1,9 +1,16 @@
 <div ng-include="'components/navbar/navbar.html'"></div>
 <div class="jumbotron">
-  <h1>Testing Pi communication!</h1>
-  <p></p>
-  <p>
-	<a class="btn btn-success btn-lg" ng-click="turnOn()" href="#" role="button">Trigger Sprinkler On</a>
-  	<a class="btn btn-danger btn-lg" ng-click="turnOff()" href="#" role="button">Trigger Sprinkler Off</a>
-  </p>
+  	<h1>Testing Pi communication!</h1>
+  	<p></p>
+
+  	<div class="col-md-4" style="text-align: center; padding: 50px 25px 50px 25px;" ng-repeat="zone in zones" ng-model="zone.status">
+	  	<div style="margin: 0 auto;" ng-model="status"> <p><h2>Zone {{zone.number}}: {{zone.status}}</h2></p></div>
+	  	<div class="checkbox" style="margin: 0 auto;">
+	    	<input id="main" type="checkbox" style="margin: auto;" data-toggle="toggle" 
+	      	data-width="200" data-height="100" 
+	      	data-onstyle="success" data-offstyle="danger"
+	      	data-on="Turn Sprinkler OFF" data-off="Turn Sprinkler ON" 
+	      	main-toggle="{{zone}}">
+	  	</div>
+	</div>
 </div>

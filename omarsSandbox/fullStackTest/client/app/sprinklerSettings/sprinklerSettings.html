@@ -15,22 +15,23 @@
       <form class="form" name="form" ng-submit="submit(form)" novalidate>
       	<div class="form-group">
 			<label>Watering Type</label>
-			<select id="wateringtype" class="form-control">
+			<select id="wateringtype" class="form-control" watering-threshold>
 			  <option value="Recommended">Recommended</option>
 			  <option value="Economical">Economical</option>
+			  <option value="Custom">Custom</option>
 			</select>
 		</div>
+
+      	<div class="form-group" ng-show="customThreshold" style="margin-left=5em">
+      		<label>Custom Water Threshold</label>
+      		<br>
+      		<input class="form-control" id="wateringthreshold" type="text" data-slider-min="0" data-slider-max="5" data-slider-step="0.25" data-slider-value="2.5"/>
+      	</div>
 
       	<div class="form-group">
       		<label>Number of Zones</label>
       		<br>
       		<input class="form-control" id="numberofzones" type="text" data-slider-min="0" data-slider-max="8" data-slider-step="1" data-slider-value="3"/>
-      	</div>
-
-      	<div class="form-group">
-      		<label>Water Threshold</label>
-      		<br>
-      		<input class="form-control" id="wateringthreshold" type="text" data-slider-min="0" data-slider-max="5" data-slider-step="0.25" data-slider-value="2.5"/>
       	</div>
 
 		<div class="form-group">

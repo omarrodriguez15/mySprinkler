@@ -8,8 +8,54 @@ angular.module('fullStackTestApp')
     //Grab user info stored in cookie
     var user = Auth.getCurrentUser();
     console.log(user);
-    
-    $scope.turnOff = function(){
+
+    var d = new Date();
+    var day;
+
+    if(d.getDay() == 0) {
+      day = 'sunday';
+    } else if(d.getDay() == 1) {
+      day = 'monday';
+    } else if(d.getDay() == 2) {
+      day = 'tuesday';
+    } else if(d.getDay() == 3) {
+      day = 'wednesday';
+    } else if(d.getDay() == 4) {
+      day = 'thursday';
+    } else if(d.getDay() == 5) {
+      day = 'friday';
+    } else if(d.getDay() == 6) {
+      day = 'saturday';
+    } 
+
+    $scope.zones = [];
+
+    $http.get('/api/schedules/'+user.schedId)
+      .success(function(res) {
+        res[day].status = ['0', '1', '0', '0', '1', '1'];  //THIS IS WHAT IS EXPECTED
+        
+        var status = [];
+
+        for(var i in res[day].status) {
+          if(res[day].status[i] == '0') {
+            status.push('OFF');
+          } else {
+            status.push('ON');  
+          }
+        }
+
+        console.log(status);
+        for(var i in status) {
+          $scope.zones.push({
+            number: Number(i) + 1,
+            status: status[i]
+          });
+        }
+
+        console.log($scope.zones);
+      });
+
+    $scope.turnOff = function(zone) {
       //should be able to use angular to get the today object
       //when the today param is fixed here it will need to be 
       //updated in the pi code too!!!
