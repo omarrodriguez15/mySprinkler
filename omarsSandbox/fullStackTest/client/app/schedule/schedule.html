@@ -11,18 +11,24 @@
       <thead><h5 class="text-primary">Suggested Times: <span class="text-success">{{days.start}} - {{days.end}}</span><br></h5>
         <th>{{days.day}}</th>
         <div class="form-group">
-          <input type="checkbox" ng-model="days.enable"> Enable<br>
+          <input type="checkbox" ng-model="days.enable" checked="{{days.enable}}"> Enable<br>
         </div> 
       </thead>
       <tbody>
         <td><p class="text-success">Start Time</p>
-        <select class="form-control" ng-model="days.start">
+        <select class="form-control" ng-model="days.start" ng-if="days.enable">
+          <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
+        </select>
+        <select class="form-control" ng-model="days.start" ng-if="!days.enable" disabled>
           <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
         </select>
         
         </td>
         <td><p class="text-danger">End Time</p>
-        <select class="form-control" ng-model="days.end">
+        <select class="form-control" ng-model="days.end" ng-if="days.enable">
+          <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
+        </select>
+        <select class="form-control" ng-model="days.end" ng-if="!days.enable" disabled>
           <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
         </select>
         </td>
@@ -30,6 +36,7 @@
     </table>
   </div>
 
+  <button class="btn btn-secondary" ng-click="defaults()" ng-hide="noPi">Revert to Defaults</button>
   <button class="btn btn-primary" type="submit" ng-click="submit()" ng-hide="noPi">Save changes</button>
 </div>
 

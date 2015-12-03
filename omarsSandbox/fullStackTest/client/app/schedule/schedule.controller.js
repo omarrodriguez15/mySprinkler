@@ -2,25 +2,32 @@
 
 var week = [
   {
-    day:'Monday'
+    day:'Monday',
+    enable: false
   },
   {
-    day:'Tuesday'
+    day:'Tuesday',
+    enable: false
   },
   {
-    day:'Wednesday'
+    day:'Wednesday',
+    enable: false
   },
   {
-    day:'Thursday'
+    day:'Thursday',
+    enable: true
   },
   {
-    day:'Friday'
+    day:'Friday',
+    enable: false
   },
   {
-    day:'Saturday'
+    day:'Saturday',
+    enable: true
   },
   {
-    day:'Sunday'
+    day:'Sunday',
+    enable: true
   }
 ];
       
@@ -81,6 +88,10 @@ angular.module('fullStackTestApp')
       });
     }
 
+    $scope.defaults = function() {
+      console.log('Reverted to defaults');
+    };
+
     $scope.submit = function() {
       var newschedule = {
         monday: {
@@ -133,7 +144,6 @@ angular.module('fullStackTestApp')
             email: user.email,
             body: JSON.stringify(newschedule) 
           }).success(function(res) {
-            console.log('EMAIL SENT');
             console.log(res);
           });
           console.log('Schedule saved successfully.');

@@ -15,7 +15,7 @@ angular.module('fullStackTestApp')
       'link': '/sprinklerSettings'
     },
     {
-      'title': 'Testing',
+      'title': 'Zones',
       'link': '/testing'
     }];
 
