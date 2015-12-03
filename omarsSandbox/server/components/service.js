@@ -424,7 +424,22 @@ function setSprinklerTimer(){
 function onStartup(){
 	console.log('Starting Up!');
 	getUserProfile(function(){
+		Forecast.find({}, function(err, forecast){
+			if (forecast.length < 1){
+				console.log('forecast.length: '+forecast.length);
+				getForecast();
+			}
+		});
+		Weather.find({}, function(err, weather){
+			if (weather.length < 1){
+				console.log('weather.length: '+weather.length);
+				getWeather();
+			}
+		});
 		setSprinklerTimer();
+		
+		
+		
 		var currHour = new Date().getHours();
 		var diff = 23 - currHour;
 		var delayTimer = 0;

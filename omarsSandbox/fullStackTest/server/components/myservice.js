@@ -7,7 +7,7 @@ var CondWeather = require('../api/condweather/condweather.model');
 
 var config = require('../config/environment');
 var currentWeather = 'http://api.openweathermap.org/data/2.5/weather';
-var forecast = 'http://api.openweathermap.org/data/2.5/forecast';
+var forecast = 'http://api.openweathermap.org/data/2.5/forecast/daily';
 
 //Open Weather API
 //Doc: http://openweathermap.org/current#geo
@@ -109,6 +109,7 @@ function updateUserForecast(user){
 			
 			body.timestamp = new Date().getTime();
 			body.ownerid = userId;
+			body.city.elevation = '112';//367ft or 112 m
 			
 			var newForecast = new Forecast(body);
 
@@ -133,7 +134,7 @@ module.exports = {
 			Weather.find({}, function(err, weather){
 				if (weather.length < 1){
 					console.log('weather.length: '+weather.length);
-					getCurrentWeather();
+					getCurrentWeather(createCondDoc);
 				}
 				setInterval(function(){
 					getCurrentWeather(createCondDoc);

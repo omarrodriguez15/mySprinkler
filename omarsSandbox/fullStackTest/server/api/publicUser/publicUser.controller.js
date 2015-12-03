@@ -16,8 +16,15 @@ exports.index = function(req, res) {
     //get the docs that are older than the timestamp passed in
     User.find({piId :req.query.piId}, function (err, user) {
       if(err) { return handleError(res, err); }
+      console.log('full user before strip: '+user);
       stripUser(user, function(usr){
-        return res.status(200).json(usr);
+        if (usr === {}){
+          console.log('Couldnt strip user :( :');
+          return res.status(500).json(usr);
+        }else{
+          console.log('user after strip: '+usr);
+          return res.status(200).json(usr);
+        }
       });
     });
   }
@@ -74,17 +81,23 @@ function stripUser(usr, cb){
   var c = JSON.parse(x);
   usr = c[0];
   
-  var strippedUsr = {
-    name: usr.name,
-    ownerid: usr._id,
-    serialnumber: usr.piId,
-    email: usr.email,
-    schedId: usr.schedId,
-    settingId: usr.settingId,
-    cord: usr.cord,
-    role: usr.role 
-  };
-  return cb(strippedUsr);
+  if(usr !== undefined){
+    var strippedUsr = {
+      name: usr.name,
+      ownerid: usr._id,
+      serialnumber: usr.piId,
+      email: usr.email,
+      schedId: usr.schedId,
+      settingId: usr.settingId,
+      cord: usr.cord,
+      role: usr.role 
+    };
+    return cb(strippedUsr);
+  }else{
+    console.log('usr is undefined');
+    return cb({});
+  }
+  
 }
 
 function handleError(res, err) {
