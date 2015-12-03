@@ -32,7 +32,7 @@ angular.module('fullStackTestApp')
 
     $http.get('/api/schedules/'+user.schedId)
       .success(function(res) {
-        res[day].status = ['0', '1', '0', '0', '1', '1'];  //THIS IS WHAT IS EXPECTED
+        res[day].status = [res.sunday.status];  //THIS IS WHAT IS EXPECTED
         
         var status = [];
 

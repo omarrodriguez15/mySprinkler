@@ -30,7 +30,6 @@ exports.create = function(req, res) {
 
 // Creates a new pi in the DB.
 exports.email = function(req, res) {
-  console.log(req.body);
   if(Object.keys(req.body).length !== 0) {
     var email = req.body.email;
     var body = req.body.body;
