@@ -113,40 +113,49 @@ def weeklyschedule(dbcollection, dt):
 
 	for day in week: #for each day of the week find the evapotranspiration
 		dailyevapotranspiration=Penman_Monteith(week[day]['tempmax'], week[day]['tempmin'],week[day]['humidity'],week[day]['speed'], week[day]['pressure'],week[day]['dt'],week[day]['lat'],week[day]['elevation'])#need pressure, lat and elevation
-		#waterinsoil=dailyevapotranspiration-(week[day]['rain']+waterinsoil) #amount of water in soil
-		if dailyevapotranspiration<week[day]['rain']:
+		print day, dailyevapotranspiration
+		if dailyevapotranspiration>float(week[day]['rain']):
 			schedule[day]='Yes'
 
 	return schedule
 
-def dailyscheduler(dbcollection, dt, weeklyschedule):
+def dailyscheduler(dbcollection, dt,weeklyschedule):
 	dayofweek=str(datetime.utcfromtimestamp(dt).weekday())
-	weather=collection.find_one({"timestamp": dt}) #fix this after finalizing database
+	weather=dbcollection.find_one({"timestamp": dt}) #fix this after finalizing database
+	days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday', 'Saturday']
+	schedule=dict.fromkeys(days, 'No')
+	for day in days:
+		schedule[day]=weeklyschedule[day]
+	
 	shouldwater='No'
-
-	dailyevapotranspiration=Penman_Monteith(weather['temp_max'], weather['temp_min'],weather['humidity'],weather['windspeed'], weather['pressure'],weather['dt'],weather['latitude'],weather['elevation'])
+	printer.pprint(weather)
+	dailyevapotranspiration=Penman_Monteith(weather['temp_max'], weather['temp_min'],weather['humidity'],weather['windspeed'], weather['pressure'],weather['timestamp'],weather['latitude'],int(weather['elevation']))
+	print dailyevapotranspiration
+	print weather['rain']
 	#waterinsoil=dailyevapotranspiration-(weather['rain']+waterinsoil) #amount of water in soil
-	if dailyevapotranspiration<week[day]['rain']:
+	if dailyevapotranspiration>float(weather['rain']):
 		shouldwater='Yes'
 
-	weeklyschedule[dayofweek]=shouldwater
-	return weeklyschedule
+	schedule[days[int(dayofweek)]]=shouldwater
+	return schedule
 ##################### Time Info #####################
 unixtimestamp=int(time.time())
 ##################### Mongo Client #####################
 
 client = MongoClient() #you can specify a mongo url to mongoclient()
-db=client['testweather'] #set to database
+db=client['mySprinkler'] #set to database
 weekcollection=db['forecasts'] #set to weeklyforecast collection
 dailycollection=db['condweathers'] #set to daily forecast collection
-schedule=db['schedule']
-scheduleid=db.schedule.find_one()["_id"]
+schedule=db['schedules']
+wateringschedule =db['wateringschedule']
+scheduleid=db.wateringschedule.find_one()["_id"]
 printer=pprint.PrettyPrinter(indent=2)
 
-#schedule=weeklyschedule(weekcollection,1449079200) #change to unixtimestamp
-#printer.pprint(schedule)
-#db.schedule.update({"_id" : scheduleid},schedule)
+schedule=weeklyschedule(weekcollection,1449079200) #change to unixtimestamp
+printer.pprint(schedule)
+db.wateringschedule.update({"_id" : scheduleid},schedule)
 
-updatedschedule=dailyscheduler(dailycollection,1449095272242,schedule) #change to unixtimestamp
+timestamp="1449095272"
+updatedschedule=dailyscheduler(dailycollection,1449095272,schedule) #change to unixtimestamp
 printer.pprint(updatedschedule)
-db.schedule.update({"_id" : scheduleid},updatedschedule)
+db.wateringschedule.update({"_id" : scheduleid},updatedschedule)
