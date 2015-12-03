@@ -129,7 +129,13 @@ angular.module('fullStackTestApp')
 
       $http.put('/api/schedules/' + user.schedId, newschedule)
         .success(function() {
-
+          $http.post('/api/pis/email/', {
+            email: user.email,
+            body: JSON.stringify(newschedule) 
+          }).success(function(res) {
+            console.log('EMAIL SENT');
+            console.log(res);
+          });
           console.log('Schedule saved successfully.');
         });
     };

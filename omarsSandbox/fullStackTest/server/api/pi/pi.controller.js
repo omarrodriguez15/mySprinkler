@@ -28,6 +28,42 @@ exports.create = function(req, res) {
   });
 };
 
+// Creates a new pi in the DB.
+exports.email = function(req, res) {
+  console.log(req.body);
+  if(Object.keys(req.body).length !== 0) {
+    var email = req.body.email;
+    var body = req.body.body;
+
+    var nodemailer = require('nodemailer');
+    var transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: 'mysprinklerservices@gmail.com', // Your email id
+        pass: 'mysprinkler1234' // Your password
+      }
+    });
+      
+    var mailOptions = {
+        from: '<mysprinklerservices@gmail.com>', // sender address
+        to: '<' + email + '>', // list of receivers
+        subject: 'Schedule Confirmation', // Subject line
+        text: body // Plain-text
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+        if(error){
+            console.log(error);
+            res.json({yo: 'error'});
+        } else {
+            console.log('Message sent: ' + info.response);
+            res.json({yo: info.response});
+        }
+    });
+  }
+
+  return res;
+}
 // Updates an existing pi in the DB.
 exports.update = function(req, res) {
   if(req.body._id) { delete req.body._id; }
@@ -41,6 +77,8 @@ exports.update = function(req, res) {
     });
   });
 };
+
+
 
 // Deletes a pi from the DB.
 exports.destroy = function(req, res) {
