@@ -78,16 +78,18 @@ def Penman_Monteith(Tempmax,Tempmin, RHmax, windspeed, Pressure, dt, lat, elevat
 ####################################################################
 
 def weeklyschedule(dbcollection, dt):
-	weather=dbcollection.find_one({"list.0.dt": dt}) #take out cnt after finalizing database schema
+	weather=dbcollection.find_one({"cnt" :7, "list.0.dt": dt}) #take out cnt after finalizing database schema
 
 	weeklyforecast=weather['list']
 	days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday', 'Saturday']
 	week=dict.fromkeys(days)
 	schedule=dict.fromkeys(days, 'No')
 	properties=['dt', 'humidity', 'speed', 'tempmax', 'tempmin', 'rain', 'pressure', 'lat', 'elevation']
+	latitude=weather['city']['coord']['lat']
+	elevation=int(weather['city']['elevation'])
 
 	##################### extracting info #####################
-	# need to get pressure elevation and lat data
+	
 	#adjust for new input
 	for day in week:
 		week[day]={'dt': None, 'humidity': None, 'speed': None, 'tempmax': None,'tempmin': None, 'rain': None, 'pressure': None, 'lat': None, 'elevation': None}
@@ -95,13 +97,20 @@ def weeklyschedule(dbcollection, dt):
 		for info in properties:
 			if info in weeklyforecast[weatherday].keys():
 				week[day][info]=weeklyforecast[weatherday][info]
+			elif info=='lat':
+				week[day]['lat']=latitude
+			elif info=='elevation':
+				week[day]['elevation']=elevation
+			elif info=='tempmax':
+				week[day]['tempmax']=weeklyforecast[weatherday]['temp']['max']
+			elif info=='tempmin':
+				week[day]['tempmin']=weeklyforecast[weatherday]['temp']['min']
 			else:
 				week[day][info]=0
 
 	printer.pprint(week)
 	##################### Algorithm #####################
-	#waterinsoil=0 #fix this so it only sets to 0 on first use
-	#threshold=1.0 #adjust to whatever we decide threshold
+
 	for day in week: #for each day of the week find the evapotranspiration
 		dailyevapotranspiration=Penman_Monteith(week[day]['tempmax'], week[day]['tempmin'],week[day]['humidity'],week[day]['speed'], week[day]['pressure'],week[day]['dt'],week[day]['lat'],week[day]['elevation'])#need pressure, lat and elevation
 		#waterinsoil=dailyevapotranspiration-(week[day]['rain']+waterinsoil) #amount of water in soil
@@ -115,7 +124,7 @@ def dailyscheduler(dbcollection, dt, weeklyschedule):
 	weather=collection.find_one({"timestamp": dt}) #fix this after finalizing database
 	shouldwater='No'
 
-	dailyevapotranspiration=Penman_Monteith(weather['tempmax'], weather['tempmin'],weather['humidity'],weather['speed'], weather['pressure'],weather['dt'],weather['lat'],weather['elevation'])
+	dailyevapotranspiration=Penman_Monteith(weather['temp_max'], weather['temp_min'],weather['humidity'],weather['windspeed'], weather['pressure'],weather['dt'],weather['latitude'],weather['elevation'])
 	#waterinsoil=dailyevapotranspiration-(weather['rain']+waterinsoil) #amount of water in soil
 	if dailyevapotranspiration<week[day]['rain']:
 		shouldwater='Yes'
@@ -128,16 +137,16 @@ unixtimestamp=int(time.time())
 
 client = MongoClient() #you can specify a mongo url to mongoclient()
 db=client['testweather'] #set to database
-weekcollection=db['rainweek'] #set to weeklyforecast collection
-#dailycollection=db['condweathers'] #set to daily forecast collection
+weekcollection=db['forecasts'] #set to weeklyforecast collection
+dailycollection=db['condweathers'] #set to daily forecast collection
 schedule=db['schedule']
 scheduleid=db.schedule.find_one()["_id"]
 printer=pprint.PrettyPrinter(indent=2)
 
-schedule=weeklyschedule(weekcollection,1445709600) #change to unixtimestamp
+#schedule=weeklyschedule(weekcollection,1449079200) #change to unixtimestamp
+#printer.pprint(schedule)
+#db.schedule.update({"_id" : scheduleid},schedule)
 
-db.schedule.update({"_id" : scheduleid},schedule)
-
-#updatedschedule=dailyscheduler(dailycollection,1447702807039,schedule) #change to unixtimestamp
-
-#db.schedule.update({"_id" : scheduleid},updatedschedule)
+updatedschedule=dailyscheduler(dailycollection,1449095272242,schedule) #change to unixtimestamp
+printer.pprint(updatedschedule)
+db.schedule.update({"_id" : scheduleid},updatedschedule)
