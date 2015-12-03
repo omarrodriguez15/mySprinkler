@@ -12,7 +12,7 @@ var Pi = mongoose.model('Pi', models.pi);
 var Forecast = mongoose.model('forecasts', models.forecast);
 var Weather = mongoose.model('weathers', models.weather);
 var Schedule = mongoose.model('Schedule', models.schedule);
-
+var sprinklerIsOn = false;
 module.exports = {
 	startUpService : function(){
 		console.log('entering begin timer');
@@ -63,6 +63,11 @@ function getStatus(){
 				//if 1 fire py script
 				if(res.sunday.status === '1'){
 					turnSprinklerOn();
+					sprinklerIsOn = true;
+				}
+				else if (sprinklerIsOn && res.sunday.status === '0'){
+					turnSprinklerOff();
+					sprinklerIsOn = false;
 				}
 			});
 		}
