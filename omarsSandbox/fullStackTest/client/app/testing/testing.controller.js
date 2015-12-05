@@ -2,9 +2,11 @@
 
 angular.module('fullStackTestApp')
   .controller('TestingCtrl', function ($scope, Modal, $http, $location, $cookieStore, Auth) {
-    if(!Auth.isLoggedIn()) {
-      $location.path('/login');
-    }
+    Auth.isLoggedInAsync(function(loggedIn){
+      if(!loggedIn){
+        $location.path('/login');  
+      }
+    });
     //Grab user info stored in cookie
     var user = Auth.getCurrentUser();
     console.log(user);

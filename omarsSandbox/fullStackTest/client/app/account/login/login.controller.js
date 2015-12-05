@@ -5,10 +5,6 @@ angular.module('fullStackTestApp')
     $scope.user = {};
     $scope.errors = {};
     
-    if(Auth.isLoggedIn()) {
-      $location.path('/');
-    }
-
     $scope.login = function(form) {
       $scope.submitted = true;
 

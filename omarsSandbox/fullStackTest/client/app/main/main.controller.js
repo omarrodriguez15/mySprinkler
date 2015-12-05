@@ -4,10 +4,11 @@ angular.module('fullStackTestApp')
   .controller('MainCtrl', function ($scope, $http, Auth, socket, $location) {
     $scope.awesomeThings = [];
 
-    if(!Auth.isLoggedIn()) {
-      $location.path('/login');
-    }
-
+    Auth.isLoggedInAsync(function(loggedIn){
+      if(!loggedIn){
+        $location.path('/login');  
+      }
+    });
     var user = Auth.getCurrentUser();
     $scope.city = user.city;
     console.log(user);
@@ -43,5 +44,5 @@ angular.module('fullStackTestApp')
 
     $scope.$on('$destroy', function () {
       socket.unsyncUpdates('thing');
-    });
+    });   
   });

@@ -53,10 +53,11 @@ angular.module('fullStackTestApp')
     $scope.noPi = false;
     
     //check if user is logged in
-    if(!Auth.isLoggedIn()) {
-      $location.path('/login');
-    }
-
+    Auth.isLoggedInAsync(function(loggedIn){
+      if(!loggedIn){
+        $location.path('/login');  
+      }
+    });
     //Grab user info stored in cookie
     var user = Auth.getCurrentUser();
     console.log(user);

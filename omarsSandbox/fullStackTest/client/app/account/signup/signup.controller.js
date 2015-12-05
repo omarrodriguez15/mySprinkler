@@ -4,11 +4,7 @@ angular.module('fullStackTestApp')
   .controller('SignupCtrl', function ($scope, Auth, $location, $window) {
     $scope.user = {};
     $scope.errors = {};
-
-    if(Auth.isLoggedIn()) {
-      $location.path('/');
-    }
-
+    
     $scope.register = function(form) {
       $scope.submitted = true;
 

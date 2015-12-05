@@ -3,11 +3,7 @@
 angular.module('fullStackTestApp')
   .controller('SettingsCtrl', function ($scope, User, Auth, $location) {
     $scope.errors = {};
-
-    if(!Auth.isLoggedIn()) {
-      $location.path('/login');
-    }
-
+    
     $scope.changePassword = function(form) {
       $scope.submitted = true;
       if(form.$valid) {
@@ -21,5 +17,5 @@ angular.module('fullStackTestApp')
           $scope.message = '';
         });
       }
-		};
+    };
   });

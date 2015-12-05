@@ -2,9 +2,11 @@
 
 angular.module('fullStackTestApp')
   .controller('SprinklerSettingsCtrl', function ($scope, Auth, Modal, $http, $location) {
-    if(!Auth.isLoggedIn()) {
-      $location.path('/login');
-    }
+    Auth.isLoggedInAsync(function(loggedIn){
+      if(!loggedIn){
+        $location.path('/login');  
+      }
+    });
 
     var user = Auth.getCurrentUser();
     console.log(user);
