@@ -5,40 +5,47 @@ var mongoose = require('mongoose'),
 
 var ScheduleSchema = new Schema({
   monday:{
-    start: String,
-    end: String,
-    status: String
-  },
-  tuesday:{
-    start: String,
-    end: String,
-    status: String
-  },
-  wednesday:{
-    start: String,
-    end: String,
-    status: String
-  },
-  thursday:{
-    start: String,
-    end: String,
-    status: String
-  },
-  friday:{
-    start: String,
-    end: String,
-    status: String
-  },
-  saturday:{
-    start: String,
-    end: String,
-    status: String
-  },
-  sunday:{
-    start: String,
-    end: String,
-    status: String
-  }
+		start: String,
+		end: String,
+		status: String,
+		watertoday: Boolean
+	},
+	tuesday:{
+		start: String,
+		end: String,
+		status: String,
+		watertoday: Boolean
+	},
+	wednesday:{
+		start: String,
+		end: String,
+		status: String,
+		watertoday: Boolean
+	},
+	thursday:{
+		start: String,
+		end: String,
+		status: String,
+		watertoday: Boolean
+	},
+	friday:{
+		start: String,
+		end: String,
+		status: String,
+		watertoday: Boolean
+	},
+	saturday:{
+		start: String,
+		end: String,
+		status: String,
+		watertoday: Boolean
+	},
+	sunday:{
+		start: String,
+		end: String,
+		status: String,
+		watertoday: Boolean
+	}
 });
 
 module.exports = mongoose.model('Schedule', ScheduleSchema);
