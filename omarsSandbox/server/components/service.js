@@ -38,16 +38,17 @@ function getUserProfile(cb){
 				newPi.save(function(err){
 					if(err) console.log(err);
 					console.log('Saved new Pi info successfully');
+					cb();
 				});
 			});
 			
 		}
 		else{
 			console.log('Already have user profile, go on with life.');
+			cb();
 		}
 		
 	});
-	cb();
 }
 
 //Get schedule from webserver to check status

@@ -2,32 +2,25 @@
 
 var week = [
   {
-    day:'Monday',
-    enable: false
+    day:'Monday'
   },
   {
-    day:'Tuesday',
-    enable: false
+    day:'Tuesday'
   },
   {
-    day:'Wednesday',
-    enable: false
+    day:'Wednesday'
   },
   {
-    day:'Thursday',
-    enable: true
+    day:'Thursday'
   },
   {
-    day:'Friday',
-    enable: false
+    day:'Friday'
   },
   {
-    day:'Saturday',
-    enable: true
+    day:'Saturday'
   },
   {
-    day:'Sunday',
-    enable: true
+    day:'Sunday'
   }
 ];
       
@@ -41,6 +34,7 @@ function createScheduleArray(sched, cb){
     var day = week[i].day.toString().toLowerCase();
     
     newWeek[i].start = sched[day].start;
+    newWeek[i].watertoday = sched[day].watertoday;
     newWeek[i].end = sched[day].end;
   }
   //send back new week object
@@ -49,7 +43,7 @@ function createScheduleArray(sched, cb){
         
         
 angular.module('fullStackTestApp')
-  .controller('ScheduleCtrl', function ($scope, $location, $cookieStore, $http, Auth, $route) {
+  .controller('ScheduleCtrl', function ($scope, $location, $cookieStore, $http, Auth, $window) {
     $scope.noPi = false;
     
     //check if user is logged in
@@ -69,7 +63,7 @@ angular.module('fullStackTestApp')
         $http.put('/api/publicUsers/'+user._id,{piId : txtPiId}).success(function(res){
           console.log('res: '+res);
           console.log('success');
-          $route.reload();
+          $window.location.reload();
         });
       };
     }
@@ -89,52 +83,56 @@ angular.module('fullStackTestApp')
       });
     }
 
-    $scope.defaults = function() {
-      console.log('Reverted to defaults');
-    };
-
     $scope.submit = function() {
       var newschedule = {
         monday: {
           start: '',
           end: '',
-          status: ''
+          status: '',
+          watertoday: ''
         },
         tuesday: {
           start: '',
           end: '',
-          status: ''
+          status: '',
+          watertoday: ''
         },
         wednesday: {
           start: '',
           end: '',
-          status: ''
+          status: '',
+          watertoday: ''
         },
         thursday: {
           start: '',
           end: '',
-          status: ''
+          status: '',
+          watertoday: ''
         },
         friday: {
           start: '',
           end: '',
-          status: ''
+          status: '',
+          watertoday: ''
         },
         saturday: {
           start: '',
           end: '',
-          status: ''
+          status: '',
+          watertoday: ''
         },
         sunday: {
           start: '',
           end: '',
-          status: ''
+          status: '',
+          watertoday: ''
         }
       };
 
       for(var day in week) {
         newschedule[week[day].day.toLowerCase()].start = week[day].start;
         newschedule[week[day].day.toLowerCase()].end = week[day].end;
+        newschedule[week[day].day.toLowerCase()].watertoday = week[day].watertoday;
         //newschedule[week[day].day.toLowerCase()]['status'] = week[day].status;
         newschedule[week[day].day.toLowerCase()].status = '0';
       }    
@@ -145,9 +143,64 @@ angular.module('fullStackTestApp')
             email: user.email,
             body: JSON.stringify(newschedule) 
           }).success(function(res) {
+            //Add some toast confirmming the save and email...
+            
             console.log(res);
           });
           console.log('Schedule saved successfully.');
         });
     };
+    
+    $scope.defaults = function() {
+      console.log('Revert to defaults');
+      $http.put('/api/schedules/' + user.schedId, {
+          monday:{
+            start: '07:00',
+            end: '08:00',
+            status: '0',
+            watertoday: true
+          },
+          tuesday:{
+            start: '07:00',
+            end: '08:00',
+            status: '0',
+            watertoday: true
+          },
+          wednesday:{
+            start: '07:00',
+            end: '08:00',
+            status: '0',
+            watertoday: true
+          },
+          thursday:{
+            start: '07:00',
+            end: '08:00',
+            status: '0',
+            watertoday: true
+          },
+          friday:{
+            start: '07:00',
+            end: '08:00',
+            status: '0',
+            watertoday: true
+          },
+          saturday:{
+            start: '07:00',
+            end: '08:00',
+            status: '0',
+            watertoday: true
+          },
+          sunday:{
+            start: '07:00',
+            end: '08:00',
+            status: '0',
+            watertoday: true
+          },
+        })
+        .success(function() {
+          console.log('Schedule saved successfully.');
+          $window.location.reload();
+        });
+    };
+    
   });

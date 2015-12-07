@@ -145,8 +145,12 @@ module.exports = {
 					getForecast();
 				}, 604800000);
 			});
-		});
-		
-		 
-	}
+		}); 
+	},
+	getForecast: function(){
+			getForecast();
+		},
+	getCurrentWeather: function(){
+			getCurrentWeather(createCondDoc);
+		}
 }

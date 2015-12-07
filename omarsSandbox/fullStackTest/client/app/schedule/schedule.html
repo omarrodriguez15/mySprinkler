@@ -11,24 +11,24 @@
       <thead><h5 class="text-primary">Suggested Times: <span class="text-success">{{days.start}} - {{days.end}}</span><br></h5>
         <th>{{days.day}}</th>
         <div class="form-group">
-          <input type="checkbox" ng-model="days.enable" checked="{{days.enable}}"> Enable<br>
+          <input type="checkbox" ng-model="days.watertoday" checked="{{days.watertoday}}"> Water Today <br>
         </div> 
       </thead>
       <tbody>
         <td><p class="text-success">Start Time</p>
-        <select class="form-control" ng-model="days.start" ng-if="days.enable">
+        <select class="form-control" ng-model="days.start" ng-if="days.watertoday">
           <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
         </select>
-        <select class="form-control" ng-model="days.start" ng-if="!days.enable" disabled>
+        <select class="form-control" ng-model="days.start" ng-if="!days.watertoday" disabled>
           <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
         </select>
         
         </td>
         <td><p class="text-danger">End Time</p>
-        <select class="form-control" ng-model="days.end" ng-if="days.enable">
+        <select class="form-control" ng-model="days.end" ng-if="days.watertoday">
           <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
         </select>
-        <select class="form-control" ng-model="days.end" ng-if="!days.enable" disabled>
+        <select class="form-control" ng-model="days.end" ng-if="!days.watertoday" disabled>
           <option ng-repeat="time in times" value="{{time}}">{{time}}</option>
         </select>
         </td>

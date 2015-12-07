@@ -69,6 +69,10 @@ exports.create = function (req, res, next) {
         newUser.save(function(err, user) {
           if (err) return validationError(res, err);
           var token = jwt.sign({_id: user._id }, config.secrets.session, { expiresIn: 3600*5 });
+          //do intial weather pings for forecast and current weather
+          var weatherService = require('../../components/myservice');
+          weatherService.getForecast();
+          weatherService.getCurrentWeather();
           return res.json({ token: token });
         });
         
