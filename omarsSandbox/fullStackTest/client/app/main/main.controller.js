@@ -20,6 +20,10 @@ angular.module('fullStackTestApp')
     
     $http.get('/api/condweather/latest').success(function(condWeather) {
       console.log('res: '+ JSON.stringify(condWeather));
+      var srcs = 'http://openweathermap.org/img/w/'+condWeather.icon+'.png';
+      console.log('src: '+srcs);
+      $scope.src = srcs;
+      $scope.temp = condWeather.temp;
       //$scope.temp = condWeather.temp;
       //$scope.icon = condWeather.icon;
     });

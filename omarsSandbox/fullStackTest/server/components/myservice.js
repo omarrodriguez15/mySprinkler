@@ -38,7 +38,7 @@ function createCondDoc(weatherRes){
 	_newCondWeather.latitude = weatherRes.coord.lat;
 	_newCondWeather.temp_min = weatherRes.main.temp_min;
 	_newCondWeather.temp_max = weatherRes.main.temp_max;
-	_newCondWeather.icon = weatherRes.weather.icon;
+	_newCondWeather.icon = weatherRes.weather[0].icon;
 	_newCondWeather.elevation = '112';//367ft or 112 m
 	//rain property only exist if it rained in pass 3 hours
 	_newCondWeather.rain = typeof weatherRes.rain === 'undefined'? '0': _newCondWeather.rain = weatherRes.rain['3h'];
