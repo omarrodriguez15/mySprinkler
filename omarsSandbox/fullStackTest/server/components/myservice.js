@@ -34,7 +34,7 @@ function createCondDoc(weatherRes){
 	_newCondWeather.windspeed = weatherRes.wind.speed;
 	_newCondWeather.ownerid = weatherRes.ownerid;
 	_newCondWeather.timestamp = weatherRes.timestamp;
-	_newCondWeather.pressure = weatherRes.main.grnd_level;//pressure at grnd lvl
+	_newCondWeather.pressure = weatherRes.main.pressure;//pressure at grnd lvl
 	_newCondWeather.latitude = weatherRes.coord.lat;
 	_newCondWeather.temp_min = weatherRes.main.temp_min;
 	_newCondWeather.temp_max = weatherRes.main.temp_max;
