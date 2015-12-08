@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('fullStackTestApp')
-  .controller('SettingsCtrl', function ($scope, User, Auth, $location) {
+  .controller('SettingsCtrl', function ($scope, User, Auth) {
     $scope.errors = {};
     
     $scope.changePassword = function(form) {

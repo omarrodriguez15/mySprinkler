@@ -13,6 +13,8 @@ var Forecast = mongoose.model('forecasts', models.forecast);
 var Weather = mongoose.model('weathers', models.weather);
 var Schedule = mongoose.model('Schedule', models.schedule);
 var sprinklerIsOn = false;
+var days=['sunday','monday','tuesday','wednesday','thursday','friday', 'saturday']
+
 module.exports = {
 	startUpService : function(){
 		console.log('entering begin timer');
@@ -52,21 +54,21 @@ function getUserProfile(cb){
 }
 
 //Get schedule from webserver to check status
-function getStatus(){
+function getStatus(currDate){
 	console.log('getStatus');
 	
 	Pi.find({}, function(err, info){
 		if(info.length > 0){
 			performRequest('/api/schedules/'+info[0].schedId,'GET',{},function(res){
 				//get current day and time and check that status
-				console.log('Response: '+res.sunday.status);
+				console.log('Response: '+res[days[currDate.getDay()]].status);
 				//TODO:
 				//if 1 fire py script
-				if(res.sunday.status === '1'){
+				if(res[days[currDate.getDay()]].status === '1' && !sprinklerIsOn){
 					turnSprinklerOn();
 					sprinklerIsOn = true;
 				}
-				else if (sprinklerIsOn && res.sunday.status === '0'){
+				else if (sprinklerIsOn && res[days[currDate.getDay()]].status === '0'){
 					turnSprinklerOff();
 					sprinklerIsOn = false;
 				}
@@ -365,7 +367,6 @@ function turnSprinklerOff(){
 }
 
 //just for testing hopefully
-var days=['sunday','monday','tuesday','wednesday','thursday','friday', 'saturday']
 	
 function setSprinklerTimer(){
 	console.log('setSprinklerTimer');
@@ -424,6 +425,7 @@ function setSprinklerTimer(){
 
 function onStartup(){
 	console.log('Starting Up!');
+	var currentDate = new Date();
 	getUserProfile(function(){
 		Forecast.find({}, function(err, forecast){
 			if (forecast.length < 1){
@@ -441,7 +443,7 @@ function onStartup(){
 		
 		
 		
-		var currHour = new Date().getHours();
+		var currHour = currentDate.getHours();
 		var diff = 23 - currHour;
 		var delayTimer = 0;
 		
@@ -469,7 +471,7 @@ function onStartup(){
 		//3600000 miliseconds is an hour
 		//in demo change to 5000 for more real time updating of status 
 		setInterval(function(){
-			getStatus();
+			getStatus(currentDate);
 		}, 5000);
 		
 		//3600000 miliseconds is an hour

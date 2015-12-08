@@ -1,5 +1,9 @@
 'use strict';
 
+var days = ['sunday','monday','tuesday','wednesday','thursday','friday', 'saturday'];
+var currentDate = new Date();
+var daySchedObj = {};
+
 angular.module('fullStackTestApp')
   .controller('TestingCtrl', function ($scope, Modal, $http, $location, $cookieStore, Auth) {
     Auth.isLoggedInAsync(function(loggedIn){
@@ -7,36 +11,18 @@ angular.module('fullStackTestApp')
         $location.path('/login');  
       }
     });
+        
     //Grab user info stored in cookie
     var user = Auth.getCurrentUser();
     console.log(user);
-
-    var d = new Date();
-    var day;
-
-    if(d.getDay() === 0) {
-      day = 'sunday';
-    } else if(d.getDay() === 1) {
-      day = 'monday';
-    } else if(d.getDay() === 2) {
-      day = 'tuesday';
-    } else if(d.getDay() === 3) {
-      day = 'wednesday';
-    } else if(d.getDay() === 4) {
-      day = 'thursday';
-    } else if(d.getDay() === 5) {
-      day = 'friday';
-    } else if(d.getDay() === 6) {
-      day = 'saturday';
-    } 
+    var day = days[currentDate.getDay()];
 
     $scope.zones = [];
 
     $http.get('/api/schedules/'+user.schedId)
       .success(function(res) {
-        res[day].status = [res.sunday.status];  //THIS IS WHAT IS EXPECTED
-        
         var status = [];
+        daySchedObj[day] = res[day];
 
         for(var i in res[day].status) {
           if(res[day].status[i] === '0') {
@@ -56,36 +42,55 @@ angular.module('fullStackTestApp')
 
         console.log($scope.zones);
       });
-
-    $scope.turnOff = function() {
-      //should be able to use angular to get the today object
-      //when the today param is fixed here it will need to be 
-      //updated in the pi code too!!!
-      var today = {sunday:{start: '15:00', end:'16:00',status:'0'}};
-      
-      $http.put('/api/schedules/'+user.schedId, today).success(function(res) {
-        if (res.length < 1) {
-          return console.log('no schedule found!');
-        }
-        
-        $scope.schedule = res;
-        console.log(res);
-      });
-    };
-    
-    $scope.turnOn = function(){
-      var today = {sunday:{start: '15:00', end:'16:00',status:'1'}};
-      
-      $http.put('/api/schedules/'+user.schedId, today).success(function(res) {
-        if (res.length < 1) {
-          return console.log('no schedule found!');
-        }
-        
-        $scope.schedule = res;
-        console.log(res);
-      });
-    };
-    
     //$scope.delete = Modal.confirm.test(function(user){});
     
-  });
+  })
+  .directive('mainToggle', function(Auth, $http) {
+		return {
+			restrict: 'A',
+			link: function (scope, element, attrs) {
+				var zone = JSON.parse(attrs.mainToggle);
+
+				var user = Auth.getCurrentUser();
+    			console.log(user);
+
+				element.bootstrapToggle(zone.status.toLowerCase());
+				element.on('change', function() {
+					zone = JSON.parse(attrs.mainToggle);
+					var day = days[currentDate.getDay()];
+					
+					if(zone.status === 'OFF') {
+						daySchedObj[day].status = '1';
+            console.log('daySchedObj : '+JSON.stringify(daySchedObj));
+      
+						$http.put('/api/schedules/'+user.schedId, daySchedObj).success(function(res) {
+							if (res.length < 1) {
+							  return console.log('no schedule found!');
+							}
+
+							scope.schedule = res;
+							console.log(res);
+						});
+
+						scope.zones[Number(zone.number) - 1].status = 'ON';
+					} else {
+            daySchedObj[day].status = '0';
+						console.log('daySchedObj : '+JSON.stringify(daySchedObj));
+						
+						$http.put('/api/schedules/'+user.schedId, daySchedObj).success(function(res) {
+							if (res.length < 1) {
+							  return console.log('no schedule found!');
+							}
+
+							scope.schedule = res;
+							console.log(res);
+						});
+
+						scope.zones[Number(zone.number) - 1].status = 'OFF';
+					}
+
+					scope.$apply();
+				});
+			}
+		};
+	});
