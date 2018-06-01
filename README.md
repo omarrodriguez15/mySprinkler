@@ -1,5 +1,6 @@
 
-# mySprinkler
-####Transfered from my Student Github account to this account
-##A smart sprinkler controller that talks to weather service
-Design a sprinkler controller that can display a web-based interface to allow users to programthe worst case scenario sprinkler setup. More importantly, the controller should be able to retrieve weather data to adjust water amounts. I t also needs to send confirmation email and status update to owner.
+# MySprinkler  
+School project to create a smart sprinkler system.  
+
+## Smart Home Sprinkler System
+Design a sprinkler controller that can be controlled via a web-based interface. The web app should allow users to program the worst case scenario sprinkler setup. More importantly, the controller should be able to retrieve weather data to adjust water amounts on its own. It also needs to send confirmation email and status updates to owner periodically.
